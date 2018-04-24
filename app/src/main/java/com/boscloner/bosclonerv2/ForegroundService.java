@@ -5,6 +5,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.arch.lifecycle.LifecycleService;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,17 +14,41 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat.Builder;
+import android.util.Log;
+
+import com.boscloner.bosclonerv2.bluetooth.ScanBluetoothDevice;
+import com.boscloner.bosclonerv2.bluetooth.SearchBluetoothDeviceLiveData;
+import com.boscloner.bosclonerv2.bluetooth.SearchingStatus;
+import com.boscloner.bosclonerv2.util.ActionWithDataStatus;
+
+import java.util.List;
 
 import timber.log.Timber;
 
-public class ForegroundService extends Service {
+public class ForegroundService extends LifecycleService {
+
+    private SearchBluetoothDeviceLiveData searchBluetoothDeviceLiveData;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        this.searchBluetoothDeviceLiveData = new SearchBluetoothDeviceLiveData(this);
+        this.searchBluetoothDeviceLiveData.observe(this, searchingStatusListActionWithDataStatus -> {
+            Timber.d("Da li ovo radi");
+            if (searchingStatusListActionWithDataStatus != null) {
+                Timber.d("status: " + searchingStatusListActionWithDataStatus.status + " " + searchingStatusListActionWithDataStatus.message_title + searchingStatusListActionWithDataStatus.message_body);
+            }
+        });
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
         if (intent.getAction() != null) {
             if (intent.getAction().equals(Constants.Action.STARTFOREGROUND_ACTION)) {
                 Timber.i("Received Start Foreground Intent ");
                 showNotification();
+                searchBluetoothDeviceLiveData.startScanning();
             } else if (intent.getAction().equals(
                     Constants.Action.STOPFOREGROUND_ACTION)) {
                 Timber.i("Received Stop Foreground Intent");
@@ -82,6 +108,7 @@ public class ForegroundService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        super.onBind(intent);
         // in case we bind to the service, we don't do that right now.
         return null;
     }

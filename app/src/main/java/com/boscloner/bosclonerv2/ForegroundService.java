@@ -17,6 +17,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.boscloner.bosclonerv2.bluetooth.SearchBluetoothDeviceLiveData;
 
+import dagger.android.AndroidInjection;
 import timber.log.Timber;
 
 public class ForegroundService extends LifecycleService {
@@ -30,6 +31,7 @@ public class ForegroundService extends LifecycleService {
 
     @Override
     public void onCreate() {
+        AndroidInjection.inject(this);
         super.onCreate();
         this.searchBluetoothDeviceLiveData = new SearchBluetoothDeviceLiveData(this);
         prepareNotificationBuilder();

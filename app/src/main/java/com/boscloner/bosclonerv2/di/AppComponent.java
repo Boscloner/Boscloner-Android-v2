@@ -16,7 +16,8 @@ import dagger.android.support.AndroidSupportInjectionModule;
         AndroidInjectionModule.class,
         AndroidSupportInjectionModule.class,
         AppModule.class,
-        MainActivityModule.class
+        MainActivityModule.class,
+        MainServiceModule.class
 })
 public interface AppComponent {
     void inject(BosclonerApp app);

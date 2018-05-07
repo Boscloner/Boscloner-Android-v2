@@ -1,26 +1,49 @@
 package com.boscloner.bosclonerv2;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
+
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements HasSupportFragmentInjector, PermissionsFragment.PermissionGrantedCallback {
+
+    public static final int LOCATION_PERMISSION_REQUEST_CODE = 42;
+
+    @Inject
+    NavigationController navigationController;
 
     private BroadcastReceiver noPermissionBroadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent i) {
-            Timber.d("No permission for the location");
+            String action = i.getAction();
+            if (action != null) {
+                switch (i.getAction()) {
+                    case ForegroundService.NO_PERMISSION_BROADCAST: {
+                        Timber.d("No permission for the location");
+                        onPermissionGranted(LOCATION_PERMISSION_REQUEST_CODE);
+                    }
+                }
+            }
         }
     };
 
@@ -78,6 +101,28 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onPermissionGranted(int requestCode) {
+        if (isPermissionGranted()) {
+            navigationController.removePermissionFragment(this);
+            //TODO we have the permission, send that to the service, so we can continue :)
+        } else {
+            navigationController.navigateToPermissionFragment(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, null, null, LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onPermissionDenied(int requestCode) {
+        navigationController.removePermissionFragment(this);
+        //we don't have the permission, make a snackbar saying what's the problem, and update the notification.
+    }
+
+    private boolean isPermissionGranted() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
     private boolean isServiceRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         if (manager != null) {
@@ -88,5 +133,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    @Override
+    public AndroidInjector<Fragment> supportFragmentInjector() {
+        return null;
     }
 }

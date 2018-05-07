@@ -23,6 +23,7 @@ import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 import timber.log.Timber;
 
@@ -32,6 +33,9 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Inject
     NavigationController navigationController;
+
+    @Inject
+    DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
 
     private BroadcastReceiver noPermissionBroadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent i) {
@@ -55,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action",
+                Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show());
 
         if (!isServiceRunning()) {
@@ -108,7 +113,11 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
             //TODO we have the permission, send that to the service, so we can continue :)
         } else {
             navigationController.navigateToPermissionFragment(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, null, null, LOCATION_PERMISSION_REQUEST_CODE);
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION},
+                    getString(R.string.permission_retry_message),
+                    getString(R.string.permission_request_rationale),
+                    LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
 
@@ -119,8 +128,10 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     }
 
     private boolean isPermissionGranted() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     private boolean isServiceRunning() {
@@ -137,6 +148,6 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Override
     public AndroidInjector<Fragment> supportFragmentInjector() {
-        return null;
+        return dispatchingAndroidInjector;
     }
 }

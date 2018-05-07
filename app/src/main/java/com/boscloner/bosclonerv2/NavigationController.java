@@ -32,7 +32,7 @@ public class NavigationController {
             builder.requestCode(requestCode);
             if (retryMessage != null) {
                 if (forceSettingMessage != null) {
-                    builder.shouldForceAppSetting(forceSettingMessage, retryMessage);
+                    builder.shouldForceAppSetting(forceSettingMessage, forceSettingMessage);
                 }
                 builder.shouldRetry(retryMessage);
             }

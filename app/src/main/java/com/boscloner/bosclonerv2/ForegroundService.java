@@ -4,35 +4,35 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.arch.lifecycle.LifecycleService;
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
-import android.util.Log;
+import android.support.v4.content.LocalBroadcastManager;
 
-import com.boscloner.bosclonerv2.bluetooth.ScanBluetoothDevice;
 import com.boscloner.bosclonerv2.bluetooth.SearchBluetoothDeviceLiveData;
-import com.boscloner.bosclonerv2.bluetooth.SearchingStatus;
-import com.boscloner.bosclonerv2.util.ActionWithDataStatus;
-
-import java.util.List;
 
 import timber.log.Timber;
 
 public class ForegroundService extends LifecycleService {
 
+    public static final String NO_PERMISSION_BROADCAST = "com.boscloner.bosclonerv2.ForgroundService.NO_PERMISSION_BROADCAST";
+    private static Intent noPermissionBroadcast = new Intent(NO_PERMISSION_BROADCAST);
     private SearchBluetoothDeviceLiveData searchBluetoothDeviceLiveData;
+
+    private NotificationCompat.Builder notificationBuilder;
+
 
     @Override
     public void onCreate() {
         super.onCreate();
         this.searchBluetoothDeviceLiveData = new SearchBluetoothDeviceLiveData(this);
+        prepareNotificationBuilder();
         this.searchBluetoothDeviceLiveData.observe(this, searchingStatusListActionWithDataStatus -> {
             Timber.d("Da li ovo radi");
             if (searchingStatusListActionWithDataStatus != null) {
@@ -41,25 +41,7 @@ public class ForegroundService extends LifecycleService {
         });
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        if (intent.getAction() != null) {
-            if (intent.getAction().equals(Constants.Action.STARTFOREGROUND_ACTION)) {
-                Timber.i("Received Start Foreground Intent ");
-                showNotification();
-                searchBluetoothDeviceLiveData.startScanning();
-            } else if (intent.getAction().equals(
-                    Constants.Action.STOPFOREGROUND_ACTION)) {
-                Timber.i("Received Stop Foreground Intent");
-                stopForeground(true);
-                stopSelf();
-            }
-        }
-        return START_STICKY;
-    }
-
-    private void showNotification() {
+    private void prepareNotificationBuilder() {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setAction(Constants.Action.MAIN_ACTION);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -75,22 +57,7 @@ public class ForegroundService extends LifecycleService {
         Bitmap icon = BitmapFactory.decodeResource(getResources(),
                 R.drawable.bos_cloner_logo);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Create the NotificationChannel, but only on API 26+ because
-            // the NotificationChannel class is new and not in the support library
-            CharSequence name = getString(R.string.channel_name);
-            String description = getString(R.string.channel_description);
-            NotificationChannel channel = new NotificationChannel(Constants.NotificationId.CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setDescription(description);
-            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            // Register the channel with the system
-            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(channel);
-            }
-        }
-
-        Notification notification = new Builder(this, Constants.NotificationId.CHANNEL_ID)
+        notificationBuilder = new Builder(this, Constants.NotificationId.CHANNEL_ID)
                 .setContentTitle("Boscloner")
                 .setTicker("Boscloner")
                 .setContentText("Boscloner running")
@@ -99,10 +66,60 @@ public class ForegroundService extends LifecycleService {
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
                 .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop",
-                        closePendingIntent)
-                .build();
+                        closePendingIntent);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+        if (intent.getAction() != null) {
+            if (intent.getAction().equals(Constants.Action.STARTFOREGROUND_ACTION)) {
+                Timber.i("Received Start Foreground Intent ");
+                showNotification();
+                startScanning();
+            } else if (intent.getAction().equals(
+                    Constants.Action.STOPFOREGROUND_ACTION)) {
+                Timber.i("Received Stop Foreground Intent");
+                stopForeground(true);
+                stopSelf();
+            }
+        }
+        return START_STICKY;
+    }
+
+    private void startScanning() {
+        if (!LocalBroadcastManager.getInstance(this).sendBroadcast(noPermissionBroadcast)) {
+            updateNotification("Boscloner requires permission to run");
+            showNotification();
+        }
+    }
+
+    private void updateNotification(String contentText) {
+        notificationBuilder.setContentText(contentText);
+    }
+
+    private void showNotification() {
+        createNotificationChannel();
         startForeground(Constants.NotificationId.FOREGROUND_SERVICE,
-                notification);
+                notificationBuilder.build());
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            String channelName = getString(R.string.channel_name);
+            if (notificationManager != null && notificationManager.getNotificationChannel(channelName) != null) {
+                // Create the NotificationChannel, but only on API 26+ because
+                // the NotificationChannel class is new and not in the support library
+                CharSequence name = getString(R.string.channel_name);
+                String description = getString(R.string.channel_description);
+                NotificationChannel channel = new NotificationChannel(Constants.NotificationId.CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
+                channel.setDescription(description);
+                channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+                // Register the channel with the system
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
     }
 
     @Nullable

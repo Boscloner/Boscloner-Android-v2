@@ -63,6 +63,7 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
                 @Override
                 public void onScanFailed(int errorCode) {
                     Timber.d("Scan error");
+                    stopScan();
                     setValue(new ActionWithDataStatus<>(SearchingStatus.ERROR, "Error scanning devices", "Please try again"));
                 }
             };
@@ -95,7 +96,7 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
                 if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_OFF) {
                     setValue(new ActionWithDataStatus<>(SearchingStatus.ERROR,
                             "Bluetooth seems to be off",
-                            "Please check bluetooth connection and try the process again"));
+                            "Please check bluetooth connection and start the process again"));
                 }
                 if (useBLEScan) {
                     if (bluetoothAdapter != null && bluetoothAdapter.isEnabled()) {
@@ -130,6 +131,11 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
 
     @Override
     protected void onInactive() {
+        stopScan();
+        setValue(new ActionWithDataStatus<>(SearchingStatus.DONE, new ArrayList<>(foundDevices), "Devices", "Devices"));
+    }
+
+    private void stopScan() {
         if (bluetoothManager != null) {
             if (bluetoothAdapter != null) {
                 if (bleScanning) {
@@ -142,7 +148,6 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
                         bluetoothAdapter.stopLeScan(leScanCallback);
                     }
                     bleScanning = false;
-                    setValue(new ActionWithDataStatus<>(SearchingStatus.DONE, new ArrayList<>(foundDevices), "Devices", "Devices"));
                 }
             }
         }

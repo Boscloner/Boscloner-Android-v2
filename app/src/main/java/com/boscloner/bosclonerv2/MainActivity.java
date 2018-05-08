@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.boscloner.bosclonerv2.bluetooth.SearchBluetoothDeviceLiveData;
 import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
 
 import javax.inject.Inject;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     @Inject
     DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
 
-    Snackbar snackbar;
+    private Snackbar snackbar;
 
     private BroadcastReceiver noPermissionBroadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent i) {

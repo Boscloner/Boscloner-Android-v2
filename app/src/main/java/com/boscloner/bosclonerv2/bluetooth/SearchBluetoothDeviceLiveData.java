@@ -1,5 +1,6 @@
 package com.boscloner.bosclonerv2.bluetooth;
 
+import android.Manifest;
 import android.arch.lifecycle.LiveData;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -11,6 +12,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 
 import com.boscloner.bosclonerv2.util.ActionWithDataStatus;
 
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import timber.log.Timber;
 
@@ -37,7 +40,6 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
     private Set<String> foundMacAddresses;
     private Set<ScanBluetoothDevice> foundDevices;
 
-    @Inject
     public SearchBluetoothDeviceLiveData(Context context) {
         useBLEScan = context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
         this.context = context;
@@ -90,6 +92,10 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
         setValue(new ActionWithDataStatus<>(SearchingStatus.LOADING, "Searching for your oximeter, please wait.."));
         foundMacAddresses.clear();
         foundDevices.clear();
+        if (!isPermissionGranted()) {
+            setValue(new ActionWithDataStatus<>(SearchingStatus.NO_PERMISSION, "No permission", "Please grant location permission"));
+            return;
+        }
         if (bluetoothManager != null) {
             bluetoothAdapter = bluetoothManager.getAdapter();
             if (bluetoothAdapter != null) {
@@ -159,5 +165,12 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
             foundDevices.add(new ScanBluetoothDevice(device.getAddress(), signalStrengthRSSI));
             setValue(new ActionWithDataStatus<>(SearchingStatus.LOADING, new ArrayList<>(foundDevices), "Devices", "Devices"));
         }
+    }
+
+    private boolean isPermissionGranted() {
+        return ContextCompat.checkSelfPermission(context,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 }

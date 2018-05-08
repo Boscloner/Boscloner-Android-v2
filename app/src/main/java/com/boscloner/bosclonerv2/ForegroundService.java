@@ -17,6 +17,8 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.boscloner.bosclonerv2.bluetooth.SearchBluetoothDeviceLiveData;
 
+import javax.inject.Inject;
+
 import dagger.android.AndroidInjection;
 import timber.log.Timber;
 
@@ -24,26 +26,30 @@ public class ForegroundService extends LifecycleService {
 
     public static final String NO_PERMISSION_BROADCAST = "com.boscloner.bosclonerv2.ForgroundService.NO_PERMISSION_BROADCAST";
     private static Intent noPermissionBroadcast = new Intent(NO_PERMISSION_BROADCAST);
-    private SearchBluetoothDeviceLiveData searchBluetoothDeviceLiveData;
 
     private NotificationCompat.Builder notificationBuilder;
-
+    private SearchBluetoothDeviceLiveData searchBluetoothDeviceLiveData;
 
     @Override
     public void onCreate() {
         AndroidInjection.inject(this);
         super.onCreate();
-        this.searchBluetoothDeviceLiveData = new SearchBluetoothDeviceLiveData(this);
         prepareNotificationBuilder();
+        searchBluetoothDeviceLiveData = new SearchBluetoothDeviceLiveData(this);
         this.searchBluetoothDeviceLiveData.observe(this, searchingStatusListActionWithDataStatus -> {
             Timber.d("Da li ovo radi");
             if (searchingStatusListActionWithDataStatus != null) {
                 Timber.d("status: " + searchingStatusListActionWithDataStatus.status + " " + searchingStatusListActionWithDataStatus.message_title + searchingStatusListActionWithDataStatus.message_body);
+                switch (searchingStatusListActionWithDataStatus.status) {
+                    case NO_PERMISSION:
+                        noPermission();
+                        break;
+                }
             }
         });
 
         showNotification();
-        startScanning();
+        searchBluetoothDeviceLiveData.startScanning();
     }
 
     private void prepareNotificationBuilder() {
@@ -89,7 +95,7 @@ public class ForegroundService extends LifecycleService {
                 case Constants.Action.PERMISSION_RESULT_ACTION: {
                     boolean permission_granted = intent.getBooleanExtra(Constants.Action.PERMISSION_RESULT_DATA, false);
                     if (permission_granted) {
-                        startScanning();
+                        searchBluetoothDeviceLiveData.startScanning();
                     } else {
                         updateNotification("Boscloner requires permission to run");
                         showNotification();
@@ -101,7 +107,7 @@ public class ForegroundService extends LifecycleService {
         return START_STICKY;
     }
 
-    private void startScanning() {
+    private void noPermission() {
         if (!LocalBroadcastManager.getInstance(this).sendBroadcast(noPermissionBroadcast)) {
             updateNotification("Boscloner requires permission to run");
             showNotification();

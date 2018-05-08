@@ -41,6 +41,9 @@ public class ForegroundService extends LifecycleService {
                 Timber.d("status: " + searchingStatusListActionWithDataStatus.status + " " + searchingStatusListActionWithDataStatus.message_title + searchingStatusListActionWithDataStatus.message_body);
             }
         });
+
+        showNotification();
+        startScanning();
     }
 
     private void prepareNotificationBuilder() {
@@ -74,16 +77,25 @@ public class ForegroundService extends LifecycleService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        if (intent.getAction() != null) {
-            if (intent.getAction().equals(Constants.Action.STARTFOREGROUND_ACTION)) {
-                Timber.i("Received Start Foreground Intent ");
-                showNotification();
-                startScanning();
-            } else if (intent.getAction().equals(
-                    Constants.Action.STOPFOREGROUND_ACTION)) {
-                Timber.i("Received Stop Foreground Intent");
-                stopForeground(true);
-                stopSelf();
+        String action = intent.getAction();
+        if (action != null) {
+            switch (action) {
+                case Constants.Action.STOPFOREGROUND_ACTION: {
+                    Timber.i("Received Stop Foreground Intent");
+                    stopForeground(true);
+                    stopSelf();
+                    break;
+                }
+                case Constants.Action.PERMISSION_RESULT_ACTION: {
+                    boolean permission_granted = intent.getBooleanExtra(Constants.Action.PERMISSION_RESULT_DATA, false);
+                    if (permission_granted) {
+                        startScanning();
+                    } else {
+                        updateNotification("Boscloner requires permission to run");
+                        showNotification();
+                    }
+                    break;
+                }
             }
         }
         return START_STICKY;

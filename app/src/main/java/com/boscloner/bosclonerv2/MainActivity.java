@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
 
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Inject
     DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
+
+    Snackbar snackbar;
 
     private BroadcastReceiver noPermissionBroadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent i) {
@@ -58,6 +61,11 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        View coordinator = findViewById(R.id.coordinator);
+        snackbar = Snackbar.make(coordinator, "Permission needed",
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction("Grant", v -> onPermissionGranted(LOCATION_PERMISSION_REQUEST_CODE));
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action",
                 Snackbar.LENGTH_LONG)
@@ -65,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
         if (!isServiceRunning()) {
             Intent service = new Intent(MainActivity.this, ForegroundService.class);
-            service.setAction(Constants.Action.STARTFOREGROUND_ACTION);
             startService(service);
         }
     }
@@ -109,8 +116,9 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     @Override
     public void onPermissionGranted(int requestCode) {
         if (isPermissionGranted()) {
+            snackbar.dismiss();
             navigationController.removePermissionFragment(this);
-            //TODO we have the permission, send that to the service, so we can continue :)
+            sendPermissionResultToService(true);
         } else {
             navigationController.navigateToPermissionFragment(this,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -123,8 +131,9 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Override
     public void onPermissionDenied(int requestCode) {
+        snackbar.show();
         navigationController.removePermissionFragment(this);
-        //we don't have the permission, make a snackbar saying what's the problem, and update the notification.
+        sendPermissionResultToService(false);
     }
 
     private boolean isPermissionGranted() {
@@ -149,5 +158,12 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     @Override
     public AndroidInjector<Fragment> supportFragmentInjector() {
         return dispatchingAndroidInjector;
+    }
+
+    private void sendPermissionResultToService(boolean permissionGranted) {
+        Intent service = new Intent(MainActivity.this, ForegroundService.class);
+        service.setAction(Constants.Action.PERMISSION_RESULT_ACTION);
+        service.putExtra(Constants.Action.PERMISSION_RESULT_DATA, permissionGranted);
+        startService(service);
     }
 }

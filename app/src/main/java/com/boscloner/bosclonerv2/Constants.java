@@ -3,9 +3,9 @@ package com.boscloner.bosclonerv2;
 public class Constants {
     public interface Action {
         String MAIN_ACTION = "main_action";
-        String INIT_ACTION = "init_action";
-        String STARTFOREGROUND_ACTION = "startforeground_action";
         String STOPFOREGROUND_ACTION = "stopforeground_action";
+        String PERMISSION_RESULT_ACTION = "permission_result_action";
+        String PERMISSION_RESULT_DATA = "permission_result_data";
     }
 
     public interface NotificationId {

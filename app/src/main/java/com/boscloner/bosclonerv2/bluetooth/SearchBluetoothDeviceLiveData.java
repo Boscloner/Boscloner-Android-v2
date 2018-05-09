@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 
+import com.boscloner.bosclonerv2.Constants;
 import com.boscloner.bosclonerv2.util.ActionWithDataStatus;
 
 import java.util.ArrayList;
@@ -141,7 +142,7 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
         setValue(new ActionWithDataStatus<>(SearchingStatus.DONE, new ArrayList<>(foundDevices), "Devices", "Devices"));
     }
 
-    private void stopScan() {
+    public void stopScan() {
         if (bluetoothManager != null) {
             if (bluetoothAdapter != null) {
                 if (bleScanning) {
@@ -161,7 +162,7 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
 
     public void checkDevice(BluetoothDevice device, int signalStrengthRSSI) {
         Timber.d("Device " + device.getAddress() + " device rssi: " + signalStrengthRSSI);
-        if (foundMacAddresses.add(device.getAddress())) {
+        if (device.getName().equals(Constants.DEVICE_NAME) && foundMacAddresses.add(device.getAddress())) {
             foundDevices.add(new ScanBluetoothDevice(device.getAddress(), signalStrengthRSSI));
             setValue(new ActionWithDataStatus<>(SearchingStatus.LOADING, new ArrayList<>(foundDevices), "Devices", "Devices"));
         }

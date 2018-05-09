@@ -15,9 +15,10 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.boscloner.bosclonerv2.bluetooth.ScanBluetoothDevice;
 import com.boscloner.bosclonerv2.bluetooth.SearchBluetoothDeviceLiveData;
 
-import javax.inject.Inject;
+import java.util.List;
 
 import dagger.android.AndroidInjection;
 import timber.log.Timber;
@@ -44,6 +45,24 @@ public class ForegroundService extends LifecycleService {
                     case NO_PERMISSION:
                         noPermission();
                         break;
+                    case LOADING: {
+                        List<ScanBluetoothDevice> foundDevices = searchingStatusListActionWithDataStatus.data;
+                        if (foundDevices != null && !foundDevices.isEmpty()) {
+                            searchBluetoothDeviceLiveData.stopScan();
+                            //TODO add a code to connect to the device here
+                            Timber.d("Found device " + foundDevices.size());
+                        }
+                    }
+                    break;
+                    case DONE: {
+                        List<ScanBluetoothDevice> foundDevices = searchingStatusListActionWithDataStatus.data;
+                        if (foundDevices != null && !foundDevices.isEmpty()) {
+
+                        } else {
+                            searchBluetoothDeviceLiveData.startScanning();
+                        }
+                    }
+                    break;
                 }
             }
         });

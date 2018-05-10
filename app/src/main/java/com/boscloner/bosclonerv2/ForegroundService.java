@@ -15,10 +15,13 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.boscloner.bosclonerv2.bluetooth.FetchBluetoothData;
 import com.boscloner.bosclonerv2.bluetooth.ScanBluetoothDevice;
 import com.boscloner.bosclonerv2.bluetooth.SearchBluetoothDeviceLiveData;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
 import timber.log.Timber;
@@ -30,6 +33,9 @@ public class ForegroundService extends LifecycleService {
 
     private NotificationCompat.Builder notificationBuilder;
     private SearchBluetoothDeviceLiveData searchBluetoothDeviceLiveData;
+
+    @Inject
+    public FetchBluetoothData fetchBluetoothData;
 
     @Override
     public void onCreate() {
@@ -50,7 +56,9 @@ public class ForegroundService extends LifecycleService {
                         if (foundDevices != null && !foundDevices.isEmpty()) {
                             searchBluetoothDeviceLiveData.stopScan();
                             //TODO add a code to connect to the device here
-                            Timber.d("Found device " + foundDevices.size());
+                            Timber.d("Found device %s", foundDevices.size());
+                            ScanBluetoothDevice bosclonerDevice = foundDevices.get(0);
+                            fetchBluetoothData.connect(bosclonerDevice.deviceMacAddress);
                         }
                     }
                     break;

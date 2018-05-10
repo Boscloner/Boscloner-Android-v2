@@ -20,7 +20,7 @@ import javax.inject.Singleton;
 import timber.log.Timber;
 
 @Singleton
-class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<FetchBluetoothDataStatus, FetchBluetoothDataInterface>> {
+public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<FetchBluetoothDataStatus, FetchBluetoothDataInterface>> {
 
     private static final String TAG = FetchBluetoothData.class.getSimpleName();
 
@@ -155,7 +155,7 @@ class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<FetchBlue
             }
         }
     }
-    
+
     @MainThread
     public void connect(String oximeterMacAddress) {
         setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communicating with the oximeter device", "Please be patient"));

@@ -19,6 +19,7 @@ public class AppInjector {
 
     public static void init(BosclonerApp app) {
         DaggerAppComponent.builder().application(app)
+                .appModule(new AppModule(app))
                 .build().inject(app);
         app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             @Override

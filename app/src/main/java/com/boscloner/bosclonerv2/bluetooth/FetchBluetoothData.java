@@ -60,12 +60,14 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                     if (s.data != null) {
                         List<BluetoothGattService> gattServiceList = s.data.bluetoothGattServices;
                         for (BluetoothGattService gattService : gattServiceList) {
+                            Timber.d("GattService UUID %s", gattService.getUuid());
                             for (BluetoothGattCharacteristic characteristic : gattService.getCharacteristics()) {
-                                if (characteristic.getUuid().equals(DeviceLiveData.NOTIFY_UUID)) {
+                                Timber.d("Gatt characteristics: %s", characteristic.getUuid());
+                                if (characteristic.getUuid().equals(SampleGattAttributes.BOSCLONER_READ_UUID)) {
                                     Log.d("TAG", "We found the notify characteristic, and we are trying to enable it");
                                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communication with oximeter device", "Enabling characteristic notification"));
                                     deviceLiveData.setCharacteristicNotification(characteristic, true);
-                                } else if (characteristic.getUuid().equals(DeviceLiveData.WRITE_UUID)) {
+                                } else if (characteristic.getUuid().equals(SampleGattAttributes.BOSCLONER_WRITE_UUID)) {
                                     Log.d("TAG", "We found the write characteristic, and we can use it to write data");
                                     writeCharacteristic = characteristic;
                                 } else {
@@ -74,6 +76,7 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                             }
                         }
                     }
+                    //TODO report error here is we don't find write and read boscloner characteristics.
                     break;
                 case ON_CHARACTERISTIC_WRITE: {
                     if (s.data != null) {
@@ -98,7 +101,7 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                     if (s.data != null) {
                         if (s.data.bluetoothGattDescriptor != null) {
                             if (s.data.bluetoothGattDescriptor.getUuid().equals(UUID
-                                    .fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG))) {
+                                    .fromString(SampleGattAttributes.NOTIFY_CHARACTERISTIC_CONFIG))) {
                                 Log.d("TAG", "Notify characteristic enabled with success");
                                 setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTED));
                             }
@@ -129,31 +132,6 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
         writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
         deviceLiveData.writeCharacteristic(writeCharacteristic);
 
-    }
-
-    private void logCharacteristic(BluetoothGattCharacteristic characteristic) {
-        if (UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT).equals(characteristic.getUuid())) {
-            int flag = characteristic.getProperties();
-            int format;
-            if ((flag & 0x01) != 0) {
-                format = BluetoothGattCharacteristic.FORMAT_UINT16;
-                Log.d("TAG", "Heart rate format UINT16.");
-            } else {
-                format = BluetoothGattCharacteristic.FORMAT_UINT8;
-                Log.d("TAG", "Heart rate format UINT8.");
-            }
-            final int heartRate = characteristic.getIntValue(format, 1);
-            Log.d("TAG", String.format("Received heart rate: %d", heartRate));
-        } else {
-            // For all other profiles, writes the data formatted in HEX.
-            final byte[] data = characteristic.getValue();
-            if (data != null && data.length > 0) {
-                final StringBuilder stringBuilder = new StringBuilder(data.length);
-                for (byte byteChar : data)
-                    stringBuilder.append(String.format("%02X ", byteChar));
-                Log.d("TAG", new String(data) + "\n" + stringBuilder.toString());
-            }
-        }
     }
 
     @MainThread

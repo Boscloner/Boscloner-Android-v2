@@ -1,6 +1,6 @@
 package com.boscloner.bosclonerv2.bluetooth;
 
-enum FetchBluetoothDataStatus {
+public enum FetchBluetoothDataStatus {
     CONNECTING,
     CONNECTED,
     LOADING,

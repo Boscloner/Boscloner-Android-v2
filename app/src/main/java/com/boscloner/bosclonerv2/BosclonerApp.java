@@ -25,10 +25,10 @@ public class BosclonerApp extends Application implements HasActivityInjector, Ha
     @Override
     public void onCreate() {
         super.onCreate();
+        AppInjector.init(this);
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
-        AppInjector.init(this);
     }
 
     @Override

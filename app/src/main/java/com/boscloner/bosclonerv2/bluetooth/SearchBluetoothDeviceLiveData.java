@@ -161,8 +161,9 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
     }
 
     public void checkDevice(BluetoothDevice device, int signalStrengthRSSI) {
-        Timber.d("Device " + device.getAddress() + " device rssi: " + signalStrengthRSSI);
-        if (device.getName().equals(Constants.DEVICE_NAME) && foundMacAddresses.add(device.getAddress())) {
+        Timber.d("Device " + device.getName() + " " + device.getAddress() + " device rssi: " + signalStrengthRSSI);
+        String deviceName = device.getName();
+        if (deviceName != null && deviceName.equals(Constants.DEVICE_NAME) && foundMacAddresses.add(device.getAddress())) {
             foundDevices.add(new ScanBluetoothDevice(device.getAddress(), signalStrengthRSSI));
             setValue(new ActionWithDataStatus<>(SearchingStatus.LOADING, new ArrayList<>(foundDevices), "Devices", "Devices"));
         }

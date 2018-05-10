@@ -27,14 +27,7 @@ import timber.log.Timber;
 
 class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDeviceStatus, BluetoothDeviceData>> {
 
-    public static final UUID SERVIE_50KUUID = UUID
-            .fromString("0000ff12-0000-1000-8000-00805f9b34fb");
-    public static final UUID NOTIFY_UUID = UUID
-            .fromString("0000ff02-0000-1000-8000-00805f9b34fb");
-    public static final UUID WRITE_UUID = UUID
-            .fromString("0000ff01-0000-1000-8000-00805f9b34fb");
     private final static String TAG = DeviceLiveData.class.getSimpleName();
-    public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
     private static int counter = 0;
     public BluetoothGatt mBluetoothGatt;
     private BluetoothManager mBluetoothManager;
@@ -260,9 +253,9 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
         }
         mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
 
-        if (NOTIFY_UUID.equals(characteristic.getUuid())) {
+        if (SampleGattAttributes.BOSCLONER_READ_UUID.equals(characteristic.getUuid())) {
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID
-                    .fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG));
+                    .fromString(SampleGattAttributes.NOTIFY_CHARACTERISTIC_CONFIG));
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor);
         }

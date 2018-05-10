@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.arch.lifecycle.LifecycleService;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,8 +17,11 @@ import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.boscloner.bosclonerv2.bluetooth.FetchBluetoothData;
+import com.boscloner.bosclonerv2.bluetooth.FetchBluetoothDataInterface;
+import com.boscloner.bosclonerv2.bluetooth.FetchBluetoothDataStatus;
 import com.boscloner.bosclonerv2.bluetooth.ScanBluetoothDevice;
 import com.boscloner.bosclonerv2.bluetooth.SearchBluetoothDeviceLiveData;
+import com.boscloner.bosclonerv2.util.ActionWithDataStatus;
 
 import java.util.List;
 
@@ -43,16 +47,16 @@ public class ForegroundService extends LifecycleService {
         super.onCreate();
         prepareNotificationBuilder();
         searchBluetoothDeviceLiveData = new SearchBluetoothDeviceLiveData(this);
-        this.searchBluetoothDeviceLiveData.observe(this, searchingStatusListActionWithDataStatus -> {
-            Timber.d("Da li ovo radi");
-            if (searchingStatusListActionWithDataStatus != null) {
-                Timber.d("status: " + searchingStatusListActionWithDataStatus.status + " " + searchingStatusListActionWithDataStatus.message_title + searchingStatusListActionWithDataStatus.message_body);
-                switch (searchingStatusListActionWithDataStatus.status) {
+        this.searchBluetoothDeviceLiveData.observe(this, status -> {
+            Timber.d("Scan data stats %s", status);
+            if (status != null) {
+                Timber.d("status: " + status.status + " " + status.message_title + status.message_body);
+                switch (status.status) {
                     case NO_PERMISSION:
                         noPermission();
                         break;
                     case LOADING: {
-                        List<ScanBluetoothDevice> foundDevices = searchingStatusListActionWithDataStatus.data;
+                        List<ScanBluetoothDevice> foundDevices = status.data;
                         if (foundDevices != null && !foundDevices.isEmpty()) {
                             searchBluetoothDeviceLiveData.stopScan();
                             //TODO add a code to connect to the device here
@@ -63,7 +67,7 @@ public class ForegroundService extends LifecycleService {
                     }
                     break;
                     case DONE: {
-                        List<ScanBluetoothDevice> foundDevices = searchingStatusListActionWithDataStatus.data;
+                        List<ScanBluetoothDevice> foundDevices = status.data;
                         if (foundDevices != null && !foundDevices.isEmpty()) {
 
                         } else {
@@ -73,6 +77,10 @@ public class ForegroundService extends LifecycleService {
                     break;
                 }
             }
+        });
+
+        fetchBluetoothData.observe(this, status -> {
+            Timber.d("Fetch data status %s", status);
         });
 
         showNotification();

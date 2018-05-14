@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.boscloner.bosclonerv2.util.ActionWithDataStatus;
 import com.boscloner.bosclonerv2.util.SampleGattAttributes;
@@ -27,7 +26,6 @@ import timber.log.Timber;
 
 class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDeviceStatus, BluetoothDeviceData>> {
 
-    private final static String TAG = DeviceLiveData.class.getSimpleName();
     private static int counter = 0;
     public BluetoothGatt mBluetoothGatt;
     private BluetoothManager mBluetoothManager;
@@ -39,7 +37,7 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status,
                                             int newState) {
-            Timber.d("On state change: " + newState);
+            Timber.d("On state change: %s", newState);
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.CONNECTED));
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -53,7 +51,7 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.SERVICES_DISCOVERY_SUCCESS, BluetoothDeviceData.newInstance(gatt.getServices())));
             } else {
-                Log.e(TAG, "onServicesDiscovered received: " + status);
+                Timber.e("onServicesDiscovered received: %s", status);
             }
         }
 
@@ -63,36 +61,36 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.ON_CHARACTERISTIC_READ));
             } else {
-                Log.e(TAG, "onCharacteristicRead received: " + status);
+                Timber.e("onCharacteristicRead received: %s", status);
             }
         }
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt,
                                           BluetoothGattCharacteristic characteristic, int status) {
-            Log.d(TAG, "On characteristic write");
+            Timber.d("On characteristic write");
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.ON_CHARACTERISTIC_WRITE));
             } else {
-                Log.e(TAG, "onCharacteristic write problem: " + status);
+                Timber.e("onCharacteristic write problem: %s", status);
             }
         }
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
-            Log.d(TAG, "Before characteristic change");
+            Timber.d("Before characteristic change");
             counter++;
-            Log.d(TAG, "Counter " + counter);
-            Log.d(TAG, "DATA LENGTH: " + characteristic.getValue().length);
+            Timber.d("Counter %s", counter);
+            Timber.d("DATA LENGTH: %s", characteristic.getValue().length);
             StringBuilder stringBuilder = new StringBuilder();
             for (int i = 0; i < characteristic.getValue().length; i++) {
                 stringBuilder.append(characteristic.getValue()[i]).append(" ");
             }
-            Log.d(TAG, " " + stringBuilder.toString());
-            Log.d(TAG, "____________________________________");
+            Timber.d(" %s", stringBuilder.toString());
+            Timber.d("____________________________________");
             sendCharacteristic(characteristic);
-            Log.d(TAG, "After characteristic change");
+            Timber.d("After characteristic change");
         }
 
         @Override
@@ -101,7 +99,7 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.ON_DESCRIPTOR_WRITE, BluetoothDeviceData.newInstance(descriptor)));
             } else {
-                Log.e(TAG, "onDescriptor write: " + status);
+                Timber.e("onDescriptor write: %s", status);
             }
         }
 
@@ -143,14 +141,14 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
         if (mBluetoothManager == null) {
             mBluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
             if (mBluetoothManager == null) {
-                Log.e(TAG, "Unable to initialize BluetoothManager.");
+                Timber.e("Unable to initialize BluetoothManager.");
                 setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.ERROR, "Bluetooth Error", "This device does not have bluetooth capabilities"));
                 return;
             }
         }
         mBluetoothAdapter = mBluetoothManager.getAdapter();
         if (mBluetoothAdapter == null) {
-            Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
+            Timber.e("Unable to obtain a BluetoothAdapter.");
             setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.ERROR, "Bluetooth initialization Error", "Unable to obtain BluetoothAdapter"));
             return;
         }
@@ -163,8 +161,7 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
         setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.INITIALIZATION_SUCCESS));
 
         if (address == null) {
-            Log.w(TAG,
-                    "Unspecified device address.");
+            Timber.w("Unspecified device address.");
             setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.ERROR, "Bluetooth Error", "Unspecified device address."));
             return;
         }
@@ -172,8 +169,7 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
         if (mBluetoothDeviceAddress != null
                 && address.equals(mBluetoothDeviceAddress)
                 && mBluetoothGatt != null) {
-            Log.d(TAG,
-                    "Trying to use an existing mBluetoothGatt for connection.");
+            Timber.d("Trying to use an existing mBluetoothGatt for connection.");
             setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.TRYING_TO_USE_EXISTING_CONNECTION));
             if (mBluetoothGatt.connect()) {
                 setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.CONNECTING));
@@ -197,7 +193,7 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
     }
 
     /**
-     * This method should be only called when there is succesfull connection to the oximeter.
+     * This method should be only called when there is succesfull connection to the device.
      */
     public void startServiceDiscovery() {
         if (mBluetoothGatt == null) {
@@ -217,7 +213,7 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
 
     public boolean disconnect() {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized");
+            Timber.w("BluetoothAdapter not initialized");
             close();
             setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.ERROR));
             return false;
@@ -237,7 +233,7 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
 
     public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.e(TAG, "BluetoothAdapter not initialized");
+            Timber.e("BluetoothAdapter not initialized");
             setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.ERROR, "Bluetooth readCharacteristic Error", "Bluetooth not initialized"));
             return;
         }
@@ -247,7 +243,7 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
     public void setCharacteristicNotification(
             BluetoothGattCharacteristic characteristic, boolean enabled) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.e(TAG, "BluetoothAdapter not initialized");
+            Timber.e("BluetoothAdapter not initialized");
             setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.ERROR, "Bluetooth setCharacteristicNotification Error", "Bluetooth not initialized"));
             return;
         }
@@ -264,7 +260,7 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
 
     public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (mBluetoothGatt == null || characteristic == null) {
-            Log.e(TAG, "BluetoothAdapter not initialized");
+            Timber.e("BluetoothAdapter not initialized");
             setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.ERROR, "Bluetooth setCharacteristicNotification Error", "Bluetooth not initialized"));
             return;
         }

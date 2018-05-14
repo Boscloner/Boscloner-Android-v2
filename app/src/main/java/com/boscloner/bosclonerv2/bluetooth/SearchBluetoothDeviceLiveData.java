@@ -90,7 +90,7 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
     }
 
     public void startScanning() {
-        setValue(new ActionWithDataStatus<>(SearchingStatus.LOADING, "Searching for your oximeter, please wait.."));
+        setValue(new ActionWithDataStatus<>(SearchingStatus.LOADING, "Searching for your device, please wait.."));
         foundMacAddresses.clear();
         foundDevices.clear();
         if (!isPermissionGranted()) {

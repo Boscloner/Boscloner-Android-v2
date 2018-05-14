@@ -15,11 +15,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.boscloner.bosclonerv2.bluetooth.SearchBluetoothDeviceLiveData;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
 
 import javax.inject.Inject;
@@ -68,9 +69,13 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                 .setAction("Grant", v -> onPermissionGranted(LOCATION_PERMISSION_REQUEST_CODE));
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action",
-                Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
+
+        fab.setOnClickListener(v -> showInputDialog());
+
+
+//        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action",
+//                Snackbar.LENGTH_LONG)
+//                .setAction("Action", null).show());
 
         if (!isServiceRunning()) {
             Intent service = new Intent(MainActivity.this, ForegroundService.class);
@@ -166,5 +171,15 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         service.setAction(Constants.Action.PERMISSION_RESULT_ACTION);
         service.putExtra(Constants.Action.PERMISSION_RESULT_DATA, permissionGranted);
         startService(service);
+    }
+
+    private void showInputDialog() {
+        new MaterialDialog.Builder(this)
+                .title(R.string.input)
+                .content(R.string.input_content)
+                .inputType(InputType.TYPE_CLASS_TEXT)
+                .input(R.string.input_hint, R.string.input_prefill, (dialog, input) -> {
+                    Timber.d("user input %s", input);
+                }).show();
     }
 }

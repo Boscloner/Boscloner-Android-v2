@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.support.annotation.MainThread;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.boscloner.bosclonerv2.util.ActionWithDataStatus;
 import com.boscloner.bosclonerv2.util.AppExecutors;
@@ -22,8 +21,6 @@ import timber.log.Timber;
 @Singleton
 public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<FetchBluetoothDataStatus, FetchBluetoothDataInterface>> {
 
-    private static final String TAG = FetchBluetoothData.class.getSimpleName();
-
     private DeviceLiveData deviceLiveData;
     private BluetoothGattCharacteristic writeCharacteristic;
     private AppExecutors appExecutors;
@@ -37,7 +34,7 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
 
     private void processBluetoothData(ActionWithDataStatus<BluetoothDeviceStatus, BluetoothDeviceData> s) {
         if (s != null) {
-            Log.d("TAG", "" + s.status + " " + s.message_title + " " + s.message_body);
+            Timber.d("" + s.status + " " + s.message_title + " " + s.message_body);
             switch (s.status) {
                 case INITIALIZATION_SUCCESS:
                     Timber.d("Initialization success");
@@ -45,18 +42,18 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                     break;
                 case CONNECTING:
                     Timber.d("Connecting");
-                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communicationg with the device", "Trying to connect to oximeter"));
+                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communicationg with the device", "Trying to connect to device"));
                     break;
                 case CONNECTED:
                     Timber.d("Connected");
-                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communication with oximeter device", "Connection success"));
+                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communication with device", "Connection success"));
                     deviceLiveData.startServiceDiscovery();
                     break;
                 case STARTING_SERVICE_DISCOVERY:
-                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communication with oximeter device", "Starting service discovery"));
+                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communication with device", "Starting service discovery"));
                     break;
                 case SERVICES_DISCOVERY_SUCCESS:
-                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communicationg with oximeter device", "Service discovery success"));
+                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communicationg with device", "Service discovery success"));
                     if (s.data != null) {
                         List<BluetoothGattService> gattServiceList = s.data.bluetoothGattServices;
                         for (BluetoothGattService gattService : gattServiceList) {
@@ -64,14 +61,14 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                             for (BluetoothGattCharacteristic characteristic : gattService.getCharacteristics()) {
                                 Timber.d("Gatt characteristics: %s", characteristic.getUuid());
                                 if (characteristic.getUuid().equals(SampleGattAttributes.BOSCLONER_READ_UUID)) {
-                                    Log.d("TAG", "We found the notify characteristic, and we are trying to enable it");
-                                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communication with oximeter device", "Enabling characteristic notification"));
+                                    Timber.d("We found the notify characteristic, and we are trying to enable it");
+                                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communication with device", "Enabling characteristic notification"));
                                     deviceLiveData.setCharacteristicNotification(characteristic, true);
                                 } else if (characteristic.getUuid().equals(SampleGattAttributes.BOSCLONER_WRITE_UUID)) {
-                                    Log.d("TAG", "We found the write characteristic, and we can use it to write data");
+                                    Timber.d("We found the write characteristic, and we can use it to write data");
                                     writeCharacteristic = characteristic;
                                 } else {
-                                    Log.d("TAG", "Characteristic is not known");
+                                    Timber.d("Characteristic is not known");
                                 }
                             }
                         }
@@ -80,19 +77,19 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                     break;
                 case ON_CHARACTERISTIC_WRITE: {
                     if (s.data != null) {
-                        Log.d("TAG", "write char UUID: ");
+                        Timber.d("write char UUID: ");
                     }
                 }
                 break;
                 case ON_CHARACTERISTIC_READ: {
                     if (s.data != null) {
-                        Log.d("TAG", "read char UUID: ");
+                        Timber.d("read char UUID: ");
                     }
                 }
                 break;
                 case ON_CHARACTERISTIC_CHANGED:
                     if (s.data != null) {
-                        Log.d("TAG", "on characteristic change UUID: ");
+                        Timber.d("on characteristic change UUID: ");
                         //TODO see what to do with the value that we get from the boscloner.
 
                     }
@@ -102,20 +99,20 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                         if (s.data.bluetoothGattDescriptor != null) {
                             if (s.data.bluetoothGattDescriptor.getUuid().equals(UUID
                                     .fromString(SampleGattAttributes.NOTIFY_CHARACTERISTIC_CONFIG))) {
-                                Log.d("TAG", "Notify characteristic enabled with success");
+                                Timber.d("Notify characteristic enabled with success");
                                 setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTED));
                             }
                         }
                     }
                     break;
                 case DISCONNECTED:
-                    Timber.d("Oximeter disconnected");
-                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.DISCONNECTED, "Oximeter disconnected"));
+                    Timber.d("Device disconnected");
+                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.DISCONNECTED, "Device disconnected"));
                     //since we are over with this connection, clear the value, so when we next attach we don't get disconnect right away.
                     setValue(null);
                     break;
                 case ERROR:
-                    Timber.d("Oximeter error");
+                    Timber.d("Device error");
                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.ERROR, s.message_title, s.message_body));
                 case BLUETOOTH_OFF:
                     Timber.d("Blutooth off");
@@ -135,19 +132,19 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     }
 
     @MainThread
-    public void connect(String oximeterMacAddress) {
-        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communicating with the oximeter device", "Please be patient"));
-        if (oximeterMacAddress == null || TextUtils.isEmpty(oximeterMacAddress)) {
+    public void connect(String DeviceMacAddress) {
+        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communicating with the device", "Please be patient"));
+        if (DeviceMacAddress == null || TextUtils.isEmpty(DeviceMacAddress)) {
             Timber.d("Blueotooth problem, device mac not set");
-            setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.ERROR, "Bluetooth problem error", "Oximeter deviceMac address not set"));
+            setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.ERROR, "Bluetooth problem error", "Device deviceMac address not set"));
         } else {
-            deviceLiveData.connect(oximeterMacAddress);
+            deviceLiveData.connect(DeviceMacAddress);
         }
     }
 
     @MainThread
     public void getBatteryLevel() {
-        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.LOADING, "Communication with oximeter device", "Getting battery level"));
+        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.LOADING, "Communication with the device", "Getting battery level"));
         sendData(DeviceCommand.GET_BATTERY_LEVEL());
     }
 

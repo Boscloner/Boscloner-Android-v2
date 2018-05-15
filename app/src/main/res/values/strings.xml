@@ -9,4 +9,9 @@
     <string name="input_content">Text of the input</string>
     <string name="input_hint">Hint</string>
     <string name="input_prefill">Prefill</string>
+    <string name="home">Home</string>
+    <string name="history">History</string>
+    <string name="settings">Settings</string>
+    <string name="custom_write">Custom Write</string>
+    <string name="auto_clone">AutoClone</string>
 </resources>

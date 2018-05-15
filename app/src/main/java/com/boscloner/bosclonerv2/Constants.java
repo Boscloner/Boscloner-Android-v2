@@ -4,6 +4,10 @@ public interface Constants {
 
     String DEVICE_NAME = "DSD TECH";
 
+    String CLONE = "$!CLONE,0102030405?$";
+    String DISABLE_CLONE = "$!DISABLE_CLONE?$";
+    String ENABLE_CLONE = "$!ENABLE_CLONE?$";
+
     interface Action {
         String MAIN_ACTION = "main_action";
         String STOPFOREGROUND_ACTION = "stopforeground_action";

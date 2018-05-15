@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -42,6 +42,19 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     private Snackbar snackbar;
 
+    private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener
+            = (item) -> {
+        switch (item.getItemId()) {
+            case R.id.navigation_home:
+                return true;
+            case R.id.navigation_history:
+                return true;
+            case R.id.navigation_settings:
+                return true;
+        }
+        return false;
+    };
+
     private BroadcastReceiver noPermissionBroadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent i) {
             String action = i.getAction();
@@ -63,19 +76,13 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        BottomNavigationView navigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
+        navigationView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
+
         View coordinator = findViewById(R.id.coordinator);
         snackbar = Snackbar.make(coordinator, "Permission needed",
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction("Grant", v -> onPermissionGranted(LOCATION_PERMISSION_REQUEST_CODE));
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-
-        fab.setOnClickListener(v -> showInputDialog());
-
-
-//        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action",
-//                Snackbar.LENGTH_LONG)
-//                .setAction("Action", null).show());
 
         if (!isServiceRunning()) {
             Intent service = new Intent(MainActivity.this, ForegroundService.class);

@@ -81,6 +81,15 @@ public class ForegroundService extends LifecycleService {
 
         fetchBluetoothData.observe(this, status -> {
             Timber.d("Fetch data status %s", status);
+            if (status != null) {
+                switch (status.status) {
+                    case ERROR:
+                    case DISCONNECTED:
+                        //we start a scan again in case of some error. Need to test this more.
+                        searchBluetoothDeviceLiveData.startScanning();
+                        break;
+                }
+            }
         });
 
         showNotification();

@@ -1,5 +1,8 @@
 package com.boscloner.bosclonerv2.di;
 
+import com.boscloner.bosclonerv2.MainActivityFragment;
+import com.boscloner.bosclonerv2.history.HistoryFragment;
+import com.boscloner.bosclonerv2.history.SettingsFragment;
 import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
 
 import dagger.Module;
@@ -10,4 +13,13 @@ public abstract class FragmentBuildersModule {
 
     @ContributesAndroidInjector
     abstract PermissionsFragment permissionsFragment();
+
+    @ContributesAndroidInjector
+    abstract HistoryFragment historyFragment();
+
+    @ContributesAndroidInjector
+    abstract SettingsFragment settingsFragment();
+
+    @ContributesAndroidInjector
+    abstract MainActivityFragment mainActivityFragment();
 }

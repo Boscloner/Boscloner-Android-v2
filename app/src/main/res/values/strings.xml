@@ -8,7 +8,7 @@
     <string name="input">Input</string>
     <string name="input_content">Text of the input</string>
     <string name="input_hint">Hint</string>
-    <string name="input_prefill">Prefill</string>
+    <string name="input_prefill"></string>
     <string name="home">Home</string>
     <string name="history">History</string>
     <string name="settings">Settings</string>

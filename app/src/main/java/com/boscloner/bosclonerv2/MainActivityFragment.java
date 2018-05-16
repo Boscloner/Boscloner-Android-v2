@@ -14,6 +14,10 @@ public class MainActivityFragment extends Fragment {
     public MainActivityFragment() {
     }
 
+    public static Fragment newInstance() {
+        return new MainActivityFragment();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

@@ -19,8 +19,10 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.boscloner.bosclonerv2.history.HistoryFragment;
 import com.boscloner.bosclonerv2.history.SettingsFragment;
 import com.boscloner.bosclonerv2.history.dummy.DummyContent;
 import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
@@ -32,7 +34,7 @@ import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements HasSupportFragmentInjector, PermissionsFragment.PermissionGrantedCallback {
+public class MainActivity extends AppCompatActivity implements HasSupportFragmentInjector, PermissionsFragment.PermissionGrantedCallback, HistoryFragment.OnListFragmentInteractionListener{
 
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 42;
 
@@ -48,13 +50,13 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
             = (item) -> {
         switch (item.getItemId()) {
             case R.id.navigation_home:
+                navigationController.navigateToMainActivityFragment(this);
                 return true;
             case R.id.navigation_history:
+                navigationController.navigateToHistoryFragment(this);
                 return true;
             case R.id.navigation_settings:
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.fragmentContainer, SettingsFragment.newInstance())
-                        .commit();
+                navigationController.navigateToSettingsFragment(this);
                 return true;
         }
         return false;
@@ -83,6 +85,14 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
         BottomNavigationView navigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
         navigationView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
+
+        TextView textView = findViewById(R.id.text_view_icon_create);
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showInputDialog();
+            }
+            });
 
         View coordinator = findViewById(R.id.coordinator);
         snackbar = Snackbar.make(coordinator, "Permission needed",
@@ -193,5 +203,10 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                 .input(R.string.input_hint, R.string.input_prefill, (dialog, input) -> {
                     Timber.d("user input %s", input);
                 }).show();
+    }
+
+    @Override
+    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+
     }
 }

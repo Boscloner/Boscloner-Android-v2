@@ -1,11 +1,17 @@
 package com.boscloner.bosclonerv2.history;
 
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
+import android.support.v7.preference.PreferenceFragmentCompat;
 
+import com.boscloner.bosclonerv2.NavigationController;
 import com.boscloner.bosclonerv2.R;
 
-public class SettingsFragment extends PreferenceFragment {
+import javax.inject.Inject;
+
+public class SettingsFragment extends PreferenceFragmentCompat {
+
+    @Inject
+    NavigationController navigationController;
 
     public SettingsFragment() {
     }
@@ -18,8 +24,7 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
     }
 }

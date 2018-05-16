@@ -60,6 +60,7 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             android:background="@drawable/ic_baseline_create_24px"
+            android:clickable="true"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/text_view_activity_main_custom_write"
             app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view"/>

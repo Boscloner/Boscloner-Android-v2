@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <PreferenceCategory
+        android:title="@string/settings_autoclone">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_key_enable_autoclone"
+            android:title="@string/settings_autoclone_status" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/boscloner_settings">
+        <ListPreference
+            android:defaultValue="@string/rfid_badge_type_default"
+            android:dialogTitle="@string/rfid_badge_type"
+            android:entries="@array/RFID"
+            android:summary="%s"
+            android:entryValues="@array/RFID"
+            android:key="rfid_badge_type"
+            android:title="@string/rfid_badge_type" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

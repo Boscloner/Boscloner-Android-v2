@@ -21,6 +21,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.boscloner.bosclonerv2.history.SettingsFragment;
+import com.boscloner.bosclonerv2.history.dummy.DummyContent;
 import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
 
 import javax.inject.Inject;
@@ -50,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
             case R.id.navigation_history:
                 return true;
             case R.id.navigation_settings:
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentContainer, SettingsFragment.newInstance())
+                        .commit();
                 return true;
         }
         return false;

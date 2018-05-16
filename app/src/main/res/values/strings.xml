@@ -14,4 +14,16 @@
     <string name="settings">Settings</string>
     <string name="custom_write">Custom Write</string>
     <string name="auto_clone">AutoClone</string>
+    <string name="settings_autoclone">AUTOCLONE DEFAULTS</string>
+    <string name="settings_autoclone_status">Enabled</string>
+    <string name="boscloner_settings">BOSCLONER SETTINGS</string>
+    <string name="rfid_badge_type">RFID Badge Type</string>
+    <string name="rfid_badge_type_default">HID ProxCard</string>
+
+    <string-array name="RFID">
+        <item>HID ProxCard</item>
+        <item>HID Indala</item>
+        <item>EM4100</item>
+        <item>HID iClass Legacy</item>
+    </string-array>
 </resources>

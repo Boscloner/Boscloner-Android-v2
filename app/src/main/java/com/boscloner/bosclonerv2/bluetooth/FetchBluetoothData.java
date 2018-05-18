@@ -1,6 +1,7 @@
 package com.boscloner.bosclonerv2.bluetooth;
 
 import android.arch.lifecycle.MediatorLiveData;
+import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.support.annotation.MainThread;
@@ -26,6 +27,9 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     private AppExecutors appExecutors;
     String messageFromBoscloner;
     String autoCloneDefault = "1";
+    boolean customWriteGlith = true;
+    boolean firstRun = true;
+    boolean writeFromHistoryFile = false;
 
     @Inject
     public FetchBluetoothData(DeviceLiveData deviceLiveData, AppExecutors appExecutors) {
@@ -102,9 +106,30 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                                     Timber.d("SCAN: clone device scan address: %s", scanDeviceAddress);
                                     autoCloneDefault = "0";
                                     messageFromBoscloner = "";
-                                    //TODO send a message from the device to the UI
                                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.SCAN, new FetchBluetoothDataValue(scanDeviceAddress)));
+                                } else if (messageFromBoscloner.contains(DeviceCommands.CLONE.getValue()) && messageFromBoscloner.contains(DeviceCommands.END_DELIMITER.getValue())) {
+                                    Timber.d("We got a CLONE message from the bosclone");
+                                    String cloneDeviceAddress = messageFromBoscloner.substring(8, messagePart.length() - 2);
+                                    Timber.d("CLONE: clone device clone address: %S", cloneDeviceAddress);
+                                    autoCloneDefault = "1";
+                                    messageFromBoscloner = "";
+                                } else if (messageFromBoscloner.contains(DeviceCommands.STATUS_MCU.getValue()) && customWriteGlith) {
+                                    if (autoCloneDefault.equals("1") && firstRun) {
+
+                                    } else if (autoCloneDefault.equals("0") && firstRun) {
+
+                                    } else if (autoCloneDefault.equals("1") && !firstRun && !writeFromHistoryFile) {
+
+                                    } else if (autoCloneDefault.equals("0") && !firstRun && !writeFromHistoryFile) {
+
+                                    } else if ((autoCloneDefault.equals("0") || autoCloneDefault.equals("1")) && !firstRun && writeFromHistoryFile) {
+
+                                    }
+                                } else if (messageFromBoscloner.contains(DeviceCommands.STATUS_MCU.getValue()) && !customWriteGlith) {
+
                                 }
+                            } else {
+                                Timber.d("Data set not complete. Nothing to print just yet");
                             }
                         }
                     }

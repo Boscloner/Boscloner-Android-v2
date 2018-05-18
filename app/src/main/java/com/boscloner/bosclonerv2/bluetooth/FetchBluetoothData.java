@@ -25,7 +25,7 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     private DeviceLiveData deviceLiveData;
     private BluetoothGattCharacteristic writeCharacteristic;
     private AppExecutors appExecutors;
-    String messageFromBoscloner;
+    String messageFromBoscloner = "";
     String autoCloneDefault = "1";
     boolean customWriteGlith = true;
     boolean firstRun = true;
@@ -95,14 +95,15 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                 break;
                 case ON_CHARACTERISTIC_CHANGED:
                     if (s.data != null) {
-                        Timber.d("on characteristic change UUID: ");
+                        Timber.d("on characteristic change");
                         if (s.data.value != null) {
                             String messagePart = new String(s.data.value);
+                            Timber.d("we got the: %s", messagePart);
                             if (!messagePart.isEmpty()) {
                                 messageFromBoscloner += messagePart;
                                 if (messageFromBoscloner.contains(DeviceCommands.SCAN.getValue()) && messageFromBoscloner.contains(DeviceCommands.END_DELIMITER.getValue())) {
                                     Timber.d("We got a SCAN message from the boscloner");
-                                    String scanDeviceAddress = messageFromBoscloner.substring(7, messagePart.length() - 2);
+                                    String scanDeviceAddress = messageFromBoscloner.substring(7, messageFromBoscloner.length() - 2);
                                     Timber.d("SCAN: clone device scan address: %s", scanDeviceAddress);
                                     autoCloneDefault = "0";
                                     messageFromBoscloner = "";

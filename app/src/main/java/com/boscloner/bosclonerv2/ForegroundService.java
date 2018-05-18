@@ -182,7 +182,7 @@ public class ForegroundService extends LifecycleService {
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelName = getString(R.string.channel_name);
-            if (notificationManager != null && notificationManager.getNotificationChannel(channelName) != null) {
+            if (notificationManager != null && notificationManager.getNotificationChannel(channelName) == null) {
                 // Create the NotificationChannel, but only on API 26+ because
                 // the NotificationChannel class is new and not in the support library
                 CharSequence name = getString(R.string.channel_name);

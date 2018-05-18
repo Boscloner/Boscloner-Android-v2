@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.arch.lifecycle.LifecycleService;
+import android.arch.persistence.room.Insert;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -20,6 +21,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.boscloner.bosclonerv2.bluetooth.FetchBluetoothData;
 import com.boscloner.bosclonerv2.bluetooth.ScanBluetoothDevice;
 import com.boscloner.bosclonerv2.bluetooth.SearchBluetoothDeviceLiveData;
+import com.boscloner.bosclonerv2.room.BosclonerDatabase;
+import com.boscloner.bosclonerv2.room.Event;
+import com.boscloner.bosclonerv2.room.EventType;
+import com.boscloner.bosclonerv2.util.AppExecutors;
 
 import java.util.List;
 
@@ -34,6 +39,13 @@ public class ForegroundService extends LifecycleService {
     private static Intent noPermissionBroadcast = new Intent(NO_PERMISSION_BROADCAST);
     @Inject
     public FetchBluetoothData fetchBluetoothData;
+
+    @Inject
+    BosclonerDatabase database;
+
+    @Inject
+    AppExecutors appExecutors;
+
     private String notificationTitle;
     private String notificationContentText;
     private NotificationCompat.Builder notificationBuilder;
@@ -94,8 +106,13 @@ public class ForegroundService extends LifecycleService {
                         if (status.data != null) {
                             notificationTitle = "Badge Captured";
                             notificationContentText = status.data.value;
-                            updateUI(status.data.value);
                             updateNotification();
+                            appExecutors.diskIO().execute(() -> {
+                                Event event = new Event();
+                                event.type = EventType.SCAN;
+                                event.value = status.data.value;
+                                database.eventDao().addEvent(event);
+                            });
                         }
                         break;
                 }

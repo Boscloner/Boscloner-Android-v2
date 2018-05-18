@@ -23,7 +23,6 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.boscloner.bosclonerv2.history.HistoryFragment;
-import com.boscloner.bosclonerv2.history.SettingsFragment;
 import com.boscloner.bosclonerv2.history.dummy.DummyContent;
 import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
 
@@ -50,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
             = (item) -> {
         switch (item.getItemId()) {
             case R.id.navigation_home:
-                navigationController.navigateToMainActivityFragment(this);
+                navigationController.navigateToHomeFragment(this);
                 return true;
             case R.id.navigation_history:
                 navigationController.navigateToHistoryFragment(this);
@@ -83,16 +82,11 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        BottomNavigationView navigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation_view);
+        BottomNavigationView navigationView = findViewById(R.id.bottom_navigation_view);
         navigationView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
         TextView textView = findViewById(R.id.text_view_icon_create);
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showInputDialog();
-            }
-            });
+        textView.setOnClickListener(v -> showInputDialog());
 
         View coordinator = findViewById(R.id.coordinator);
         snackbar = Snackbar.make(coordinator, "Permission needed",
@@ -103,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
             Intent service = new Intent(MainActivity.this, ForegroundService.class);
             startService(service);
         }
+
+        navigationController.navigateToHomeFragment(this);
     }
 
     @Override

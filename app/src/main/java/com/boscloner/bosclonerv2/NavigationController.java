@@ -83,7 +83,7 @@ public class NavigationController {
                 .commit();
     }
 
-    public void navigateToMainActivityFragment(@NonNull FragmentActivity activity) {
+    public void navigateToHomeFragment(@NonNull FragmentActivity activity) {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentByTag(MAIN_ACTIVITY_FRAGMENT_TAG);
         if (fragment == null) {

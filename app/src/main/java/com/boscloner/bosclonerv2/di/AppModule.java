@@ -4,7 +4,7 @@ import android.app.Application;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 
-import com.boscloner.bosclonerv2.room.BoscloneDatabase;
+import com.boscloner.bosclonerv2.room.BosclonerDatabase;
 
 import javax.inject.Singleton;
 
@@ -18,8 +18,8 @@ class AppModule {
 
     @Provides
     @Singleton
-    BoscloneDatabase providesDatabase(Context context) {
-        return Room.databaseBuilder(context.getApplicationContext(), BoscloneDatabase.class, "boscloner_db").build();
+    BosclonerDatabase providesDatabase(Context context) {
+        return Room.databaseBuilder(context.getApplicationContext(), BosclonerDatabase.class, "boscloner_db").build();
     }
 
     @Singleton

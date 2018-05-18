@@ -18,4 +18,13 @@ public enum RFIDBadgeType {
     public String getValue() {
         return value;
     }
+
+    public static RFIDBadgeType findValueByName(String name) {
+        for (RFIDBadgeType rfidBadgeType : RFIDBadgeType.values()) {
+            if (rfidBadgeType.value.equals(name)) {
+                return rfidBadgeType;
+            }
+        }
+        return null;
+    }
 }

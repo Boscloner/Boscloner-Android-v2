@@ -3,6 +3,7 @@ package com.boscloner.bosclonerv2;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Service;
+import android.support.v7.preference.PreferenceManager;
 
 import com.boscloner.bosclonerv2.di.AppInjector;
 
@@ -29,6 +30,7 @@ public class BosclonerApp extends Application implements HasActivityInjector, Ha
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }
 
     @Override

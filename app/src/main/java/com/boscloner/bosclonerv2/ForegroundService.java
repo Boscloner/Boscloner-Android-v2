@@ -6,10 +6,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.arch.lifecycle.LifecycleService;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
@@ -37,12 +39,15 @@ public class ForegroundService extends LifecycleService {
     private NotificationCompat.Builder notificationBuilder;
     private NotificationManager notificationManager;
     private SearchBluetoothDeviceLiveData searchBluetoothDeviceLiveData;
+    private RFIDBadgeType badgeType;
+    private boolean autoCloneSetting;
 
     @Override
     public void onCreate() {
         AndroidInjection.inject(this);
         super.onCreate();
         prepareNotification();
+        readStatusAndBadgeType();
         searchBluetoothDeviceLiveData = new SearchBluetoothDeviceLiveData(this);
         this.searchBluetoothDeviceLiveData.observe(this, status -> {
             Timber.d("Scan data stats %s", status);
@@ -86,11 +91,12 @@ public class ForegroundService extends LifecycleService {
                         searchBluetoothDeviceLiveData.startScanning();
                         break;
                     case SCAN:
-                        notificationTitle = "Badge Captured";
                         if (status.data != null) {
+                            notificationTitle = "Badge Captured";
                             notificationContentText = status.data.value;
+                            updateUI(status.data.value);
+                            updateNotification();
                         }
-                        updateNotification();
                         break;
                 }
             }
@@ -98,6 +104,17 @@ public class ForegroundService extends LifecycleService {
 
         showNotification();
         searchBluetoothDeviceLiveData.startScanning();
+    }
+
+    private void updateUI(String value) {
+        LocalBroadcastManager.getInstance(this).sendBroadcast(noPermissionBroadcast);
+    }
+
+    private void readStatusAndBadgeType() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String badgeString = preferences.getString("rfid_badge_type", "");
+        badgeType = RFIDBadgeType.findValueByName(badgeString);
+        autoCloneSetting = preferences.getBoolean("pref_key_enable_autoclone", false);
     }
 
     private void prepareNotification() {

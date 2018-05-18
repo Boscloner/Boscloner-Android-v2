@@ -1,6 +1,6 @@
 package com.boscloner.bosclonerv2.di;
 
-import com.boscloner.bosclonerv2.MainActivityFragment;
+import com.boscloner.bosclonerv2.home.HomeFragment;
 import com.boscloner.bosclonerv2.history.HistoryFragment;
 import com.boscloner.bosclonerv2.history.SettingsFragment;
 import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
@@ -21,5 +21,5 @@ public abstract class FragmentBuildersModule {
     abstract SettingsFragment settingsFragment();
 
     @ContributesAndroidInjector
-    abstract MainActivityFragment mainActivityFragment();
+    abstract HomeFragment homeFragment();
 }

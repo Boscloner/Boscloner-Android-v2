@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 
 import com.boscloner.bosclonerv2.history.HistoryFragment;
 import com.boscloner.bosclonerv2.history.SettingsFragment;
+import com.boscloner.bosclonerv2.home.HomeFragment;
 import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragmentBuilder;
 
 import javax.inject.Inject;
@@ -86,7 +87,7 @@ public class NavigationController {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentByTag(MAIN_ACTIVITY_FRAGMENT_TAG);
         if (fragment == null) {
-            fragment = MainActivityFragment.newInstance();
+            fragment = HomeFragment.newInstance();
         }
         activity.getSupportFragmentManager().beginTransaction()
                 .addToBackStack(null)

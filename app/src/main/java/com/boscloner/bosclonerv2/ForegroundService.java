@@ -35,13 +35,14 @@ public class ForegroundService extends LifecycleService {
     private String notificationTitle;
     private String notificationContentText;
     private NotificationCompat.Builder notificationBuilder;
+    private NotificationManager notificationManager;
     private SearchBluetoothDeviceLiveData searchBluetoothDeviceLiveData;
 
     @Override
     public void onCreate() {
         AndroidInjection.inject(this);
         super.onCreate();
-        prepareNotificationBuilder();
+        prepareNotification();
         searchBluetoothDeviceLiveData = new SearchBluetoothDeviceLiveData(this);
         this.searchBluetoothDeviceLiveData.observe(this, status -> {
             Timber.d("Scan data stats %s", status);
@@ -99,7 +100,9 @@ public class ForegroundService extends LifecycleService {
         searchBluetoothDeviceLiveData.startScanning();
     }
 
-    private void prepareNotificationBuilder() {
+    private void prepareNotification() {
+        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setAction(Constants.Action.MAIN_ACTION);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -167,7 +170,7 @@ public class ForegroundService extends LifecycleService {
         notificationBuilder.setContentTitle(notificationTitle)
                 .setTicker(notificationTitle)
                 .setContentText(notificationContentText);
-        showNotification();
+        notificationManager.notify(Constants.NotificationId.FOREGROUND_SERVICE, notificationBuilder.build());
     }
 
     private void showNotification() {
@@ -178,7 +181,6 @@ public class ForegroundService extends LifecycleService {
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             String channelName = getString(R.string.channel_name);
             if (notificationManager != null && notificationManager.getNotificationChannel(channelName) != null) {
                 // Create the NotificationChannel, but only on API 26+ because

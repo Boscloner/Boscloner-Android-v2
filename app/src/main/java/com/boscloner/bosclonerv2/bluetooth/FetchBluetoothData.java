@@ -24,6 +24,8 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     private DeviceLiveData deviceLiveData;
     private BluetoothGattCharacteristic writeCharacteristic;
     private AppExecutors appExecutors;
+    String messageFromBoscloner;
+    String autoCloneDefault = "1";
 
     @Inject
     public FetchBluetoothData(DeviceLiveData deviceLiveData, AppExecutors appExecutors) {
@@ -90,8 +92,20 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                 case ON_CHARACTERISTIC_CHANGED:
                     if (s.data != null) {
                         Timber.d("on characteristic change UUID: ");
-                        //TODO see what to do with the value that we get from the boscloner.
-
+                        if (s.data.value != null) {
+                            String messagePart = new String(s.data.value);
+                            if (!messagePart.isEmpty()) {
+                                messageFromBoscloner += messagePart;
+                                if (messageFromBoscloner.contains(DeviceCommands.SCAN.getValue()) && messageFromBoscloner.contains(DeviceCommands.END_DELIMITER.getValue())) {
+                                    Timber.d("We got a SCAN message from the boscloner");
+                                    String scanDeviceAddress = messageFromBoscloner.substring(7, messagePart.length() - 2);
+                                    Timber.d("SCAN: clone device scan address: %s", scanDeviceAddress);
+                                    autoCloneDefault = "0";
+                                    messageFromBoscloner = "";
+                                    //TODO send a message from the device to the UI
+                                }
+                            }
+                        }
                     }
                     break;
                 case ON_DESCRIPTOR_WRITE:
@@ -142,46 +156,8 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
         }
     }
 
-    @MainThread
-    public void getBatteryLevel() {
-        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.LOADING, "Communication with the device", "Getting battery level"));
-        sendData(DeviceCommand.GET_BATTERY_LEVEL());
-    }
-
-    @MainThread
-    public void getContiniousPRDataSize() {
-        sendData(DeviceCommand.GET_CONTINUOUS_DATA_SIZE(DeviceCommand.ContinuousDataType.PR));
-    }
-
-    @MainThread
-    public void getContiniousPRData() {
-        sendData(DeviceCommand.GET_PR_CONTINUOUS_DATA(DeviceCommand.ContinuousGetDataOption.START));
-    }
-
-    @MainThread
-    public void getContiniousSPO2DataSize() {
-        sendData(DeviceCommand.GET_CONTINUOUS_DATA_SIZE(DeviceCommand.ContinuousDataType.SPO2));
-    }
-
-    @MainThread
-    public void getContiniousSPO2Data() {
-        sendData(DeviceCommand.GET_SPO2_CONTINUOUS_DATA(DeviceCommand.ContinuousGetDataOption.START));
-    }
-
     public void disconnect() {
         deviceLiveData.disconnect();
-    }
-
-    public void setTime() {
-        sendData(DeviceCommand.SET_TIME());
-    }
-
-    public void clearContinuousPrData() {
-        sendData(DeviceCommand.DEL_CONTINUOUS_DATA(DeviceCommand.ContinuousDataType.PR));
-    }
-
-    public void clearContinuousSPO2Data() {
-        sendData(DeviceCommand.DEL_CONTINUOUS_DATA(DeviceCommand.ContinuousDataType.SPO2));
     }
 
     @Override

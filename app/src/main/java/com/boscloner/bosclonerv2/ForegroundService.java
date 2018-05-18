@@ -5,7 +5,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.arch.lifecycle.LifecycleService;
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,11 +16,8 @@ import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.boscloner.bosclonerv2.bluetooth.FetchBluetoothData;
-import com.boscloner.bosclonerv2.bluetooth.FetchBluetoothDataInterface;
-import com.boscloner.bosclonerv2.bluetooth.FetchBluetoothDataStatus;
 import com.boscloner.bosclonerv2.bluetooth.ScanBluetoothDevice;
 import com.boscloner.bosclonerv2.bluetooth.SearchBluetoothDeviceLiveData;
-import com.boscloner.bosclonerv2.util.ActionWithDataStatus;
 
 import java.util.List;
 
@@ -34,12 +30,12 @@ public class ForegroundService extends LifecycleService {
 
     public static final String NO_PERMISSION_BROADCAST = "com.boscloner.bosclonerv2.ForgroundService.NO_PERMISSION_BROADCAST";
     private static Intent noPermissionBroadcast = new Intent(NO_PERMISSION_BROADCAST);
-
-    private NotificationCompat.Builder notificationBuilder;
-    private SearchBluetoothDeviceLiveData searchBluetoothDeviceLiveData;
-
     @Inject
     public FetchBluetoothData fetchBluetoothData;
+    private String notificationTitle;
+    private String notificationContentText;
+    private NotificationCompat.Builder notificationBuilder;
+    private SearchBluetoothDeviceLiveData searchBluetoothDeviceLiveData;
 
     @Override
     public void onCreate() {
@@ -87,6 +83,13 @@ public class ForegroundService extends LifecycleService {
                     case DISCONNECTED:
                         //we start a scan again in case of some error. Need to test this more.
                         searchBluetoothDeviceLiveData.startScanning();
+                        break;
+                    case SCAN:
+                        notificationTitle = "Badge Captured";
+                        if (status.data != null) {
+                            notificationContentText = status.data.value;
+                        }
+                        updateNotification();
                         break;
                 }
             }
@@ -141,8 +144,9 @@ public class ForegroundService extends LifecycleService {
                     if (permission_granted) {
                         searchBluetoothDeviceLiveData.startScanning();
                     } else {
-                        updateNotification("Boscloner requires permission to run");
-                        showNotification();
+                        notificationTitle = "No permission";
+                        notificationContentText = "Boscloner requires permission to run";
+                        updateNotification();
                     }
                     break;
                 }
@@ -153,13 +157,17 @@ public class ForegroundService extends LifecycleService {
 
     private void noPermission() {
         if (!LocalBroadcastManager.getInstance(this).sendBroadcast(noPermissionBroadcast)) {
-            updateNotification("Boscloner requires permission to run");
-            showNotification();
+            notificationTitle = "No permission";
+            notificationContentText = "Boscloner requires permission to run";
+            updateNotification();
         }
     }
 
-    private void updateNotification(String contentText) {
-        notificationBuilder.setContentText(contentText);
+    private void updateNotification() {
+        notificationBuilder.setContentTitle(notificationTitle)
+                .setTicker(notificationTitle)
+                .setContentText(notificationContentText);
+        showNotification();
     }
 
     private void showNotification() {

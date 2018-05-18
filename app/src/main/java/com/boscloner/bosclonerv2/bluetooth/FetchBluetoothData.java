@@ -19,7 +19,7 @@ import javax.inject.Singleton;
 import timber.log.Timber;
 
 @Singleton
-public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<FetchBluetoothDataStatus, FetchBluetoothDataInterface>> {
+public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<FetchBluetoothDataStatus, FetchBluetoothDataValue>> {
 
     private DeviceLiveData deviceLiveData;
     private BluetoothGattCharacteristic writeCharacteristic;
@@ -103,6 +103,7 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                                     autoCloneDefault = "0";
                                     messageFromBoscloner = "";
                                     //TODO send a message from the device to the UI
+                                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.SCAN, new FetchBluetoothDataValue(scanDeviceAddress)));
                                 }
                             }
                         }

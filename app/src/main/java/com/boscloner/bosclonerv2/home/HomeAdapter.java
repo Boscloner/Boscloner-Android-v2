@@ -32,11 +32,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = events.get(position);
-        switch (event.type) {
-            case SCAN:
-                holder.eventText.setText(event.value);
-                break;
-        }
+        holder.eventText.setText(event.value);
     }
 
     @Override

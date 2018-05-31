@@ -5,7 +5,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.arch.lifecycle.LifecycleService;
-import android.arch.persistence.room.Insert;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -73,17 +72,18 @@ public class ForegroundService extends LifecycleService {
                         List<ScanBluetoothDevice> foundDevices = status.data;
                         if (foundDevices != null && !foundDevices.isEmpty()) {
                             searchBluetoothDeviceLiveData.stopScan();
-                            //TODO add a code to connect to the device here
                             Timber.d("Found device %s", foundDevices.size());
                             ScanBluetoothDevice bosclonerDevice = foundDevices.get(0);
                             fetchBluetoothData.connect(bosclonerDevice.deviceMacAddress);
+                            //TODO stop scan here.
                         }
                     }
                     break;
                     case DONE: {
                         List<ScanBluetoothDevice> foundDevices = status.data;
                         if (foundDevices != null && !foundDevices.isEmpty()) {
-
+                            //TODO write value to the database saying we are connected.
+                            Timber.d("We have the device and we are connected");
                         } else {
                             searchBluetoothDeviceLiveData.startScanning();
                         }
@@ -97,6 +97,11 @@ public class ForegroundService extends LifecycleService {
             Timber.d("Fetch data status %s", status);
             if (status != null) {
                 switch (status.status) {
+                    case CONNECTED:
+                        SharedPreferences settings = android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
+                        boolean autoClone = settings.getBoolean(Constants.Preferences.AUTO_CLONE_KEY, false);
+                        fetchBluetoothData.onAutoCloneChanged(autoClone);
+                        break;
                     case ERROR:
                     case DISCONNECTED:
                         //we start a scan again in case of some error. Need to test this more.
@@ -110,10 +115,61 @@ public class ForegroundService extends LifecycleService {
                             appExecutors.diskIO().execute(() -> {
                                 Event event = new Event();
                                 event.type = EventType.SCAN;
-                                event.value = status.data.value;
+                                event.value = "Boscloner$ " + status.data.value;
                                 database.eventDao().addEvent(event);
                             });
                         }
+                        break;
+                    case CLONE:
+                        if (status.data != null) {
+                            notificationTitle = "Badge Cloned";
+                            notificationContentText = status.data.value;
+                            updateNotification();
+                            appExecutors.diskIO().execute(() -> {
+                                Event event = new Event();
+                                event.type = EventType.CLONE;
+                                event.value = "Boscloner$ " + status.data.value;
+                                database.eventDao().addEvent(event);
+                            });
+                        }
+                        break;
+                    case STATUS_MCU_ENABLED:
+                        appExecutors.diskIO().execute(() -> {
+                            Event event = new Event();
+                            event.type = EventType.STATUS_MCU_ENABLED;
+                            event.value = "**AutoClone Status: Enabled**\n" +
+                                    "**RFID Badge Type: " + "rfid badge type" + "\n" +
+                                    "----------------------------" +
+                                    "Boscloner$ (Ready to Receive Data)";
+                            database.eventDao().addEvent(event);
+                        });
+                        break;
+                    case STATUS_MCU_DISABLED:
+                        appExecutors.diskIO().execute(() -> {
+                            Event event = new Event();
+                            event.type = EventType.STATUS_MCU_DISABLED;
+                            event.value = "**AutoClone Status: Disabled**\n" +
+                                    "**RFID Badge Type: " + "rfid badge type" + "\n" +
+                                    "----------------------------" +
+                                    "Boscloner$ (Ready to Receive Data)";
+                            database.eventDao().addEvent(event);
+                        });
+                        break;
+                    case AUTO_CLONE_ENABLED:
+                        appExecutors.diskIO().execute(() -> {
+                            Event event = new Event();
+                            event.type = EventType.AUTO_CLONE_ENABLED;
+                            event.value = "**AutoClone Status: Enabled**";
+                            database.eventDao().addEvent(event);
+                        });
+                        break;
+                    case AUTO_CLONE_DISABLED:
+                        appExecutors.diskIO().execute(() -> {
+                            Event event = new Event();
+                            event.type = EventType.AUTO_CLONE_DISABLED;
+                            event.value = "**AutoClone Status: Disabled**";
+                            database.eventDao().addEvent(event);
+                        });
                         break;
                 }
             }

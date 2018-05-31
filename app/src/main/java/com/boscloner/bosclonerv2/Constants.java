@@ -21,4 +21,9 @@ public interface Constants {
         int FOREGROUND_SERVICE = 42;
         String CHANNEL_ID = "boscloner_channel";
     }
+
+    interface Preferences {
+        String AUTO_CLONE_KEY = "preferences_auto_clone_key";
+        String RFID_BADGE_TYPE = "preferences_rfid_badge_type_key";
+    }
 }

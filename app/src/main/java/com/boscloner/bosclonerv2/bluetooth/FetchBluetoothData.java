@@ -1,7 +1,6 @@
 package com.boscloner.bosclonerv2.bluetooth;
 
 import android.arch.lifecycle.MediatorLiveData;
-import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.support.annotation.MainThread;
@@ -104,31 +103,37 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                                 messageFromBoscloner += messagePart;
                                 if (messageFromBoscloner.contains(DeviceCommands.SCAN.getValue()) && messageFromBoscloner.contains(DeviceCommands.END_DELIMITER.getValue())) {
                                     Timber.d("We got a SCAN message from the boscloner");
-                                    String scanDeviceAddress = messageFromBoscloner.substring(7, messageFromBoscloner.length() - 2);
+                                    String scanDeviceAddress = messageFromBoscloner.substring(7, messageFromBoscloner.length() - 1);
                                     Timber.d("SCAN: clone device scan address: %s", scanDeviceAddress);
                                     autoCloneDefault = false;
                                     messageFromBoscloner = "";
                                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.SCAN, new FetchBluetoothDataValue(scanDeviceAddress)));
                                 } else if (messageFromBoscloner.contains(DeviceCommands.CLONE.getValue()) && messageFromBoscloner.contains(DeviceCommands.END_DELIMITER.getValue())) {
                                     Timber.d("We got a CLONE message from the bosclone");
-                                    String cloneDeviceAddress = messageFromBoscloner.substring(8, messageFromBoscloner.length() - 2);
+                                    String cloneDeviceAddress = messageFromBoscloner.substring(8, messageFromBoscloner.length() - 1);
                                     Timber.d("CLONE: clone device clone address: %S", cloneDeviceAddress);
                                     autoCloneDefault = true;
                                     messageFromBoscloner = "";
+                                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CLONE, new FetchBluetoothDataValue(cloneDeviceAddress)));
                                 } else if (messageFromBoscloner.contains(DeviceCommands.STATUS_MCU.getValue()) && customWriteGlith) {
+                                    messageFromBoscloner = "";
                                     if (autoCloneDefault && firstRun) {
-
+                                        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.STATUS_MCU_ENABLED, new FetchBluetoothDataValue("")));
+                                        firstRun = false;
                                     } else if (!autoCloneDefault && firstRun) {
-
+                                        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.STATUS_MCU_DISABLED, new FetchBluetoothDataValue("")));
+                                        firstRun = false;
                                     } else if (autoCloneDefault && !firstRun && !writeFromHistoryFile) {
-
+                                        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_ENABLED, new FetchBluetoothDataValue("")));
                                     } else if (!autoCloneDefault && !firstRun && !writeFromHistoryFile) {
-
+                                        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_DISABLED, new FetchBluetoothDataValue("")));
                                     } else {
-
+                                        writeFromHistoryFile = false;
+                                        Timber.d("Write operation executed from History Log File");
                                     }
                                 } else if (messageFromBoscloner.contains(DeviceCommands.STATUS_MCU.getValue()) && !customWriteGlith) {
-
+                                    messageFromBoscloner = "";
+                                    Timber.d("Custom Data Written. Ignoring STATUS,MCU Signal");
                                 }
                             } else {
                                 Timber.d("Data set not complete. Nothing to print just yet");
@@ -201,16 +206,18 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     }
 
     public void onAutoCloneChanged(boolean isChecked) {
-        if (isChecked) {
+        if (isChecked && !autoCloneDefault) {
             customWriteGlith = true;
             sendData(Constants.ENABLE_CLONE.getBytes());
             autoCloneDefault = true;
-            //TODO update ui to say auto clone is on
-        } else {
+            setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_ENABLED, new FetchBluetoothDataValue("")));
+        } else if (!isChecked && autoCloneDefault) {
             customWriteGlith = true;
             sendData(Constants.DISABLE_CLONE.getBytes());
             autoCloneDefault = false;
-            //TODO update ui to say auto clone if off.
+            setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_DISABLED, new FetchBluetoothDataValue("")));
+        } else {
+            Timber.d("Auto clone is already on the proper value");
         }
     }
 }

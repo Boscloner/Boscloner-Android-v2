@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
@@ -14,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.Menu;
@@ -106,7 +108,11 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     }
 
     private void setupAutoCloneSwitch() {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean autoClone = settings.getBoolean(Constants.Preferences.AUTO_CLONE_KEY, false);
+
         Switch autoCloneSwitch = findViewById(R.id.switch_auto_clone);
+        autoCloneSwitch.setChecked(autoClone);
         autoCloneSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Intent service = new Intent(MainActivity.this, ForegroundService.class);
             service.setAction(Constants.Action.AUTO_CLONE_ACTION);

@@ -14,8 +14,6 @@ import android.view.ViewGroup;
 
 import com.boscloner.bosclonerv2.R;
 import com.boscloner.bosclonerv2.di.Injectable;
-import com.boscloner.bosclonerv2.history.HistoryRecyclerViewAdapter;
-import com.boscloner.bosclonerv2.history.dummy.DummyContent;
 
 import javax.inject.Inject;
 

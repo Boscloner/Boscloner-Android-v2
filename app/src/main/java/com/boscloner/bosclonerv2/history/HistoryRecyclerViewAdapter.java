@@ -1,5 +1,6 @@
 package com.boscloner.bosclonerv2.history;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,22 +9,19 @@ import android.widget.TextView;
 
 import com.boscloner.bosclonerv2.R;
 import com.boscloner.bosclonerv2.history.HistoryFragment.OnListFragmentInteractionListener;
-import com.boscloner.bosclonerv2.history.dummy.DummyContent.DummyItem;
+import com.boscloner.bosclonerv2.room.Converters;
+import com.boscloner.bosclonerv2.room.HistoryItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
     private final OnListFragmentInteractionListener mListener;
+    private List<HistoryItem> mValues;
 
-    public HistoryRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
-        mValues = items;
+    public HistoryRecyclerViewAdapter(OnListFragmentInteractionListener listener) {
+        mValues = new ArrayList<>();
         mListener = listener;
     }
 
@@ -35,33 +33,36 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        HistoryItem historyItem = mValues.get(position);
+        holder.mItem = historyItem;
+        holder.mIdView.setText(historyItem.deviceMacAddress);
+        holder.mContentView.setText(Converters.fromLocalDateTime(historyItem.localDateTime));
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
-                }
+        holder.mView.setOnClickListener(v -> {
+            if (null != mListener) {
+                // Notify the active callbacks interface (the activity, if the
+                // fragment is attached to one) that an item has been selected.
+                mListener.onListFragmentInteraction(holder.mItem);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mValues == null ? 0 : mValues.size();
+    }
+
+    public void setEvents(List<HistoryItem> events) {
+        this.mValues = events;
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
-        public DummyItem mItem;
+        public HistoryItem mItem;
 
         public ViewHolder(View view) {
             super(view);

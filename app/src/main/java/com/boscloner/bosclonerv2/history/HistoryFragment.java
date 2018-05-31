@@ -1,7 +1,10 @@
 package com.boscloner.bosclonerv2.history;
 
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,12 +13,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.boscloner.bosclonerv2.R;
-import com.boscloner.bosclonerv2.history.dummy.DummyContent;
-import com.boscloner.bosclonerv2.history.dummy.DummyContent.DummyItem;
+import com.boscloner.bosclonerv2.di.Injectable;
+import com.boscloner.bosclonerv2.home.HistoryViewModel;
+import com.boscloner.bosclonerv2.room.HistoryItem;
 
-public class HistoryFragment extends Fragment {
+import javax.inject.Inject;
 
+public class HistoryFragment extends Fragment implements Injectable {
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
     private OnListFragmentInteractionListener mListener;
+
+    private HistoryViewModel viewModel;
+    private HistoryRecyclerViewAdapter adapter;
 
     public HistoryFragment() {
     }
@@ -33,10 +44,24 @@ public class HistoryFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new HistoryRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+            linearLayoutManager.setStackFromEnd(true);
+            recyclerView.setLayoutManager(linearLayoutManager);
+            adapter = new HistoryRecyclerViewAdapter(mListener);
+            recyclerView.setAdapter(adapter);
         }
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(HistoryViewModel.class);
+        viewModel.getHistoryItems().observe(this, events -> {
+            if (events != null) {
+                adapter.setEvents(events);
+            }
+        });
     }
 
     @Override
@@ -58,6 +83,6 @@ public class HistoryFragment extends Fragment {
 
     public interface OnListFragmentInteractionListener {
 
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(HistoryItem item);
     }
 }

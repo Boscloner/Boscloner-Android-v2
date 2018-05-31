@@ -21,13 +21,12 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.boscloner.bosclonerv2.history.HistoryFragment;
-import com.boscloner.bosclonerv2.history.dummy.DummyContent;
+import com.boscloner.bosclonerv2.room.HistoryItem;
 import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
 
 import javax.inject.Inject;
@@ -222,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
-
+    public void onListFragmentInteraction(HistoryItem item) {
+        Timber.d("On item selected " + item.deviceMacAddress + " " + item.localDateTime);
     }
 }

@@ -65,4 +65,6 @@ dependencies {
     annotationProcessor "android.arch.persistence.room:compiler:1.1.1-rc1"
 
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.1.0'
 }

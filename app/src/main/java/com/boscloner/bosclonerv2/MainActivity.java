@@ -36,7 +36,7 @@ import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements HasSupportFragmentInjector, PermissionsFragment.PermissionGrantedCallback, HistoryFragment.OnListFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements HasSupportFragmentInjector, PermissionsFragment.PermissionGrantedCallback, HistoryFragment.OnListFragmentInteractionListener {
 
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 42;
 
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         return false;
     };
 
-    private BroadcastReceiver noPermissionBroadcastReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent i) {
             String action = i.getAction();
             if (action != null) {
@@ -72,7 +72,11 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                     case ForegroundService.NO_PERMISSION_BROADCAST: {
                         Timber.d("No permission for the location");
                         onPermissionGranted(LOCATION_PERMISSION_REQUEST_CODE);
+                        break;
                     }
+                    case ForegroundService.STOP_SELF:
+                        finish();
+                        break;
                 }
             }
         }
@@ -124,14 +128,14 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     public void onStart() {
         super.onStart();
         IntentFilter filter = new IntentFilter(ForegroundService.NO_PERMISSION_BROADCAST);
-        LocalBroadcastManager.getInstance(this).registerReceiver(noPermissionBroadcastReceiver,
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
                 filter);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(noPermissionBroadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
     @Override
@@ -223,5 +227,6 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     @Override
     public void onListFragmentInteraction(HistoryItem item) {
         Timber.d("On item selected " + item.deviceMacAddress + " " + item.localDateTime);
+        //TODO send this to write items inside service :)
     }
 }

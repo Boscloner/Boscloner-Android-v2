@@ -35,7 +35,10 @@ import timber.log.Timber;
 public class ForegroundService extends LifecycleService {
 
     public static final String NO_PERMISSION_BROADCAST = "com.boscloner.bosclonerv2.ForgroundService.NO_PERMISSION_BROADCAST";
+    public static final String STOP_SELF = "com.boscloer.bosclonerv2.ForgroundService.STOP_SELF";
     private static Intent noPermissionBroadcast = new Intent(NO_PERMISSION_BROADCAST);
+    private static Intent stopSelfIntent = new Intent(STOP_SELF);
+
     @Inject
     public FetchBluetoothData fetchBluetoothData;
 
@@ -179,10 +182,6 @@ public class ForegroundService extends LifecycleService {
         searchBluetoothDeviceLiveData.startScanning();
     }
 
-    private void updateUI(String value) {
-        LocalBroadcastManager.getInstance(this).sendBroadcast(noPermissionBroadcast);
-    }
-
     private void readStatusAndBadgeType() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String badgeString = preferences.getString("rfid_badge_type", "");
@@ -228,6 +227,7 @@ public class ForegroundService extends LifecycleService {
             switch (action) {
                 case Constants.Action.STOPFOREGROUND_ACTION: {
                     Timber.i("Received Stop Foreground Intent");
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(stopSelfIntent);
                     stopForeground(true);
                     stopSelf();
                     break;

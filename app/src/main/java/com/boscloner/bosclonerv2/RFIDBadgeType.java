@@ -7,8 +7,6 @@ public enum RFIDBadgeType {
     EM4100("EM4100"),
     HID_ICLASS_LEGACY("HID iClass Legacy");
 
-
-
     private String value;
 
     RFIDBadgeType(String value) {

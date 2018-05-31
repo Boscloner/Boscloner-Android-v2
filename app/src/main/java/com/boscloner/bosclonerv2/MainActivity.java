@@ -19,6 +19,8 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -82,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        setupAutoCloneSwitch();
+
         BottomNavigationView navigationView = findViewById(R.id.bottom_navigation_view);
         navigationView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
@@ -99,6 +103,16 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         }
 
         navigationController.navigateToHomeFragment(this);
+    }
+
+    private void setupAutoCloneSwitch() {
+        Switch autoCloneSwitch = findViewById(R.id.switch_auto_clone);
+        autoCloneSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            Intent service = new Intent(MainActivity.this, ForegroundService.class);
+            service.setAction(Constants.Action.AUTO_CLONE_ACTION);
+            service.putExtra(Constants.Action.AUTO_CLONE_DATA, isChecked);
+            startService(service);
+        });
     }
 
     @Override

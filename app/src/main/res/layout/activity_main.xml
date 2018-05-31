@@ -52,7 +52,7 @@
             android:textColor="@color/colorPrimaryDark"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/switch_activity_main"/>
+            app:layout_constraintBottom_toTopOf="@id/switch_auto_clone"/>
 
         <TextView
             android:id="@+id/text_view_icon_create"
@@ -68,7 +68,7 @@
             app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view"/>
 
         <Switch
-            android:id="@+id/switch_activity_main"
+            android:id="@+id/switch_auto_clone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="48dp"

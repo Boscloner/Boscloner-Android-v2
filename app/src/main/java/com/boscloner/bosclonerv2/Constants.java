@@ -13,6 +13,8 @@ public interface Constants {
         String STOPFOREGROUND_ACTION = "stopforeground_action";
         String PERMISSION_RESULT_ACTION = "permission_result_action";
         String PERMISSION_RESULT_DATA = "permission_result_data";
+        String AUTO_CLONE_ACTION = "auto_clone_action";
+        String AUTO_CLONE_DATA = "auto_clone_data";
     }
 
     interface NotificationId {

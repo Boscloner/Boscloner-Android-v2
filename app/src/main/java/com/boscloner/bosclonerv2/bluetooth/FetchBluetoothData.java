@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothGattService;
 import android.support.annotation.MainThread;
 import android.text.TextUtils;
 
+import com.boscloner.bosclonerv2.Constants;
 import com.boscloner.bosclonerv2.util.ActionWithDataStatus;
 import com.boscloner.bosclonerv2.util.AppExecutors;
 import com.boscloner.bosclonerv2.util.SampleGattAttributes;
@@ -25,8 +26,8 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     private DeviceLiveData deviceLiveData;
     private BluetoothGattCharacteristic writeCharacteristic;
     private AppExecutors appExecutors;
-    String messageFromBoscloner = "";
-    String autoCloneDefault = "1";
+    private String messageFromBoscloner = "";
+    boolean autoCloneDefault = true;
     boolean customWriteGlith = true;
     boolean firstRun = true;
     boolean writeFromHistoryFile = false;
@@ -105,25 +106,25 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                                     Timber.d("We got a SCAN message from the boscloner");
                                     String scanDeviceAddress = messageFromBoscloner.substring(7, messageFromBoscloner.length() - 2);
                                     Timber.d("SCAN: clone device scan address: %s", scanDeviceAddress);
-                                    autoCloneDefault = "0";
+                                    autoCloneDefault = false;
                                     messageFromBoscloner = "";
                                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.SCAN, new FetchBluetoothDataValue(scanDeviceAddress)));
                                 } else if (messageFromBoscloner.contains(DeviceCommands.CLONE.getValue()) && messageFromBoscloner.contains(DeviceCommands.END_DELIMITER.getValue())) {
                                     Timber.d("We got a CLONE message from the bosclone");
                                     String cloneDeviceAddress = messageFromBoscloner.substring(8, messageFromBoscloner.length() - 2);
                                     Timber.d("CLONE: clone device clone address: %S", cloneDeviceAddress);
-                                    autoCloneDefault = "1";
+                                    autoCloneDefault = true;
                                     messageFromBoscloner = "";
                                 } else if (messageFromBoscloner.contains(DeviceCommands.STATUS_MCU.getValue()) && customWriteGlith) {
-                                    if (autoCloneDefault.equals("1") && firstRun) {
+                                    if (autoCloneDefault && firstRun) {
 
-                                    } else if (autoCloneDefault.equals("0") && firstRun) {
+                                    } else if (!autoCloneDefault && firstRun) {
 
-                                    } else if (autoCloneDefault.equals("1") && !firstRun && !writeFromHistoryFile) {
+                                    } else if (autoCloneDefault && !firstRun && !writeFromHistoryFile) {
 
-                                    } else if (autoCloneDefault.equals("0") && !firstRun && !writeFromHistoryFile) {
+                                    } else if (!autoCloneDefault && !firstRun && !writeFromHistoryFile) {
 
-                                    } else if ((autoCloneDefault.equals("0") || autoCloneDefault.equals("1")) && !firstRun && writeFromHistoryFile) {
+                                    } else {
 
                                     }
                                 } else if (messageFromBoscloner.contains(DeviceCommands.STATUS_MCU.getValue()) && !customWriteGlith) {
@@ -197,5 +198,19 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     protected void onInactive() {
         Timber.d("Fetch bluetooth data inactive");
         super.onInactive();
+    }
+
+    public void onAutoCloneChanged(boolean isChecked) {
+        if (isChecked) {
+            customWriteGlith = true;
+            sendData(Constants.ENABLE_CLONE.getBytes());
+            autoCloneDefault = true;
+            //TODO update ui to say auto clone is on
+        } else {
+            customWriteGlith = true;
+            sendData(Constants.DISABLE_CLONE.getBytes());
+            autoCloneDefault = false;
+            //TODO update ui to say auto clone if off.
+        }
     }
 }

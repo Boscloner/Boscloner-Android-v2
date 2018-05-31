@@ -187,6 +187,10 @@ public class ForegroundService extends LifecycleService {
                     }
                     break;
                 }
+                case Constants.Action.AUTO_CLONE_ACTION: {
+                    boolean isChecked = intent.getBooleanExtra(Constants.Action.AUTO_CLONE_DATA, false);
+                    fetchBluetoothData.onAutoCloneChanged(isChecked);
+                }
             }
         }
         return START_STICKY;

@@ -40,6 +40,7 @@ public class HomeFragment extends Fragment implements Injectable {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+            linearLayoutManager.setStackFromEnd(true);
             recyclerView.setLayoutManager(linearLayoutManager);
             homeAdapter = new HomeAdapter();
             homeAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {

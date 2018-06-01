@@ -222,6 +222,7 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     }
 
     public void writeDataToTheDevice(String macAddress) {
-        sendData(macAddress.getBytes());
+        customWriteGlith = false;
+        sendData(String.format(Constants.CLONE, macAddress).getBytes());
     }
 }

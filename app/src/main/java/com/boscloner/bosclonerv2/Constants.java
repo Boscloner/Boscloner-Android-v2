@@ -4,7 +4,7 @@ public interface Constants {
 
     String DEVICE_NAME = "DSD TECH";
 
-    String CLONE = "$!CLONE,0102030405?$";
+    String CLONE = "$!CLONE,%s?$";
     String DISABLE_CLONE = "$!DISABLE_CLONE?$";
     String ENABLE_CLONE = "$!ENABLE_CLONE?$";
 

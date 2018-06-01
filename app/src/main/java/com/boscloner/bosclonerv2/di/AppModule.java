@@ -19,7 +19,9 @@ class AppModule {
     @Provides
     @Singleton
     BosclonerDatabase providesDatabase(Context context) {
-        return Room.databaseBuilder(context.getApplicationContext(), BosclonerDatabase.class, "boscloner_db").build();
+        return Room.databaseBuilder(context.getApplicationContext(), BosclonerDatabase.class, "boscloner_db")
+                .fallbackToDestructiveMigration()
+                .build();
     }
 
     @Singleton

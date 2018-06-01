@@ -222,30 +222,32 @@ public class ForegroundService extends LifecycleService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        String action = intent.getAction();
-        if (action != null) {
-            switch (action) {
-                case Constants.Action.STOPFOREGROUND_ACTION: {
-                    Timber.i("Received Stop Foreground Intent");
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(stopSelfIntent);
-                    stopForeground(true);
-                    stopSelf();
-                    break;
-                }
-                case Constants.Action.PERMISSION_RESULT_ACTION: {
-                    boolean permission_granted = intent.getBooleanExtra(Constants.Action.PERMISSION_RESULT_DATA, false);
-                    if (permission_granted) {
-                        searchBluetoothDeviceLiveData.startScanning();
-                    } else {
-                        notificationTitle = "No permission";
-                        notificationContentText = "Boscloner requires permission to run";
-                        updateNotification();
+        if (intent != null) {
+            String action = intent.getAction();
+            if (action != null) {
+                switch (action) {
+                    case Constants.Action.STOPFOREGROUND_ACTION: {
+                        Timber.i("Received Stop Foreground Intent");
+                        LocalBroadcastManager.getInstance(this).sendBroadcast(stopSelfIntent);
+                        stopForeground(true);
+                        stopSelf();
+                        break;
                     }
-                    break;
-                }
-                case Constants.Action.AUTO_CLONE_ACTION: {
-                    boolean isChecked = intent.getBooleanExtra(Constants.Action.AUTO_CLONE_DATA, false);
-                    fetchBluetoothData.onAutoCloneChanged(isChecked);
+                    case Constants.Action.PERMISSION_RESULT_ACTION: {
+                        boolean permission_granted = intent.getBooleanExtra(Constants.Action.PERMISSION_RESULT_DATA, false);
+                        if (permission_granted) {
+                            searchBluetoothDeviceLiveData.startScanning();
+                        } else {
+                            notificationTitle = "No permission";
+                            notificationContentText = "Boscloner requires permission to run";
+                            updateNotification();
+                        }
+                        break;
+                    }
+                    case Constants.Action.AUTO_CLONE_ACTION: {
+                        boolean isChecked = intent.getBooleanExtra(Constants.Action.AUTO_CLONE_DATA, false);
+                        fetchBluetoothData.onAutoCloneChanged(isChecked);
+                    }
                 }
             }
         }

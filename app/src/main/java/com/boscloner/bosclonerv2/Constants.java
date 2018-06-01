@@ -15,6 +15,9 @@ public interface Constants {
         String PERMISSION_RESULT_DATA = "permission_result_data";
         String AUTO_CLONE_ACTION = "auto_clone_action";
         String AUTO_CLONE_DATA = "auto_clone_data";
+        String WRITE_MAC_ADDRESS = "write_mac_address";
+        String WRITE_MAC_ADDRESS_DATA = "write_mac_address_data";
+        String WRITE_MAC_ADDRESS_HISTORY = "write_mac_address_history";
     }
 
     interface NotificationId {

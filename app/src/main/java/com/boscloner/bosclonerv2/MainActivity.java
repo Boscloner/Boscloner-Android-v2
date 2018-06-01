@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -221,12 +222,21 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                 .inputType(InputType.TYPE_CLASS_TEXT)
                 .input(R.string.input_hint, R.string.input_prefill, (dialog, input) -> {
                     Timber.d("user input %s", input);
+                    sendWriteInstructionToService(input, false);
                 }).show();
+    }
+
+    private void sendWriteInstructionToService(CharSequence input, boolean history) {
+        Intent service = new Intent(MainActivity.this, ForegroundService.class);
+        service.setAction(Constants.Action.WRITE_MAC_ADDRESS);
+        service.putExtra(Constants.Action.WRITE_MAC_ADDRESS, input);
+        service.putExtra(Constants.Action.WRITE_MAC_ADDRESS_HISTORY, history);
+        startService(service);
     }
 
     @Override
     public void onListFragmentInteraction(HistoryItem item) {
         Timber.d("On item selected " + item.deviceMacAddress + " " + item.localDateTime);
-        //TODO send this to write items inside service :)
+        sendWriteInstructionToService(item.deviceMacAddress, true);
     }
 }

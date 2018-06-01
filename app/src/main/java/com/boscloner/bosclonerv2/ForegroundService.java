@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v4.content.LocalBroadcastManager;
@@ -23,7 +24,10 @@ import com.boscloner.bosclonerv2.bluetooth.SearchBluetoothDeviceLiveData;
 import com.boscloner.bosclonerv2.room.BosclonerDatabase;
 import com.boscloner.bosclonerv2.room.Event;
 import com.boscloner.bosclonerv2.room.EventType;
+import com.boscloner.bosclonerv2.room.HistoryItem;
 import com.boscloner.bosclonerv2.util.AppExecutors;
+
+import org.threeten.bp.LocalDateTime;
 
 import java.util.List;
 
@@ -120,6 +124,10 @@ public class ForegroundService extends LifecycleService {
                                 event.type = EventType.SCAN;
                                 event.value = "Boscloner$ " + status.data.value;
                                 database.eventDao().addEvent(event);
+                                HistoryItem historyItem = new HistoryItem();
+                                historyItem.localDateTime = LocalDateTime.now();
+                                historyItem.deviceMacAddress = status.data.value;
+                                database.historyItemDao().add(historyItem);
                             });
                         }
                         break;
@@ -133,6 +141,10 @@ public class ForegroundService extends LifecycleService {
                                 event.type = EventType.CLONE;
                                 event.value = "Boscloner$ " + status.data.value;
                                 database.eventDao().addEvent(event);
+                                HistoryItem historyItem = new HistoryItem();
+                                historyItem.localDateTime = LocalDateTime.now();
+                                historyItem.deviceMacAddress = status.data.value;
+                                database.historyItemDao().add(historyItem);
                             });
                         }
                         break;
@@ -247,6 +259,18 @@ public class ForegroundService extends LifecycleService {
                     case Constants.Action.AUTO_CLONE_ACTION: {
                         boolean isChecked = intent.getBooleanExtra(Constants.Action.AUTO_CLONE_DATA, false);
                         fetchBluetoothData.onAutoCloneChanged(isChecked);
+                    }
+                    case Constants.Action.WRITE_MAC_ADDRESS: {
+                        String macAddress = intent.getStringExtra(Constants.Action.WRITE_MAC_ADDRESS_DATA);
+                        boolean fromHistory = intent.getBooleanExtra(Constants.Action.WRITE_MAC_ADDRESS_HISTORY, false);
+                        fetchBluetoothData.writeDataToTheDevice(macAddress);
+                        String source = fromHistory ? "Custom ID Written: " : "Written from Historry: ";
+                        appExecutors.diskIO().execute(() -> {
+                            Event event = new Event();
+                            event.type = EventType.VALUE_WRITE;
+                            event.value = source + macAddress;
+                            database.eventDao().addEvent(event);
+                        });
                     }
                 }
             }

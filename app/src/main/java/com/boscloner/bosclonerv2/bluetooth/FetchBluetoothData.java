@@ -220,4 +220,8 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
             Timber.d("Auto clone is already on the proper value");
         }
     }
+
+    public void writeDataToTheDevice(String macAddress) {
+        sendData(macAddress.getBytes());
+    }
 }

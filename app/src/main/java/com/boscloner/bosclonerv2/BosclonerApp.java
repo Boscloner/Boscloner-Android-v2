@@ -6,6 +6,7 @@ import android.app.Service;
 import android.support.v7.preference.PreferenceManager;
 
 import com.boscloner.bosclonerv2.di.AppInjector;
+import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import javax.inject.Inject;
 
@@ -26,6 +27,7 @@ public class BosclonerApp extends Application implements HasActivityInjector, Ha
     @Override
     public void onCreate() {
         super.onCreate();
+        AndroidThreeTen.init(this);
         AppInjector.init(this);
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());

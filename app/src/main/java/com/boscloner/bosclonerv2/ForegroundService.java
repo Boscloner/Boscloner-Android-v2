@@ -265,7 +265,7 @@ public class ForegroundService extends LifecycleService {
                         String macAddress = intent.getStringExtra(Constants.Action.WRITE_MAC_ADDRESS_DATA);
                         boolean fromHistory = intent.getBooleanExtra(Constants.Action.WRITE_MAC_ADDRESS_HISTORY, false);
                         fetchBluetoothData.writeDataToTheDevice(macAddress);
-                        String source = fromHistory ? "Custom ID Written: " : "Written from Historry: ";
+                        String source = fromHistory ? "Custom ID Written: " : "Written from History: ";
                         appExecutors.diskIO().execute(() -> {
                             Event event = new Event();
                             event.type = EventType.VALUE_WRITE;

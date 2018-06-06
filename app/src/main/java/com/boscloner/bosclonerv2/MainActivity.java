@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     private void sendWriteInstructionToService(CharSequence input, boolean history) {
         Intent service = new Intent(MainActivity.this, ForegroundService.class);
         service.setAction(Constants.Action.WRITE_MAC_ADDRESS);
-        service.putExtra(Constants.Action.WRITE_MAC_ADDRESS, input);
+        service.putExtra(Constants.Action.WRITE_MAC_ADDRESS_DATA, input);
         service.putExtra(Constants.Action.WRITE_MAC_ADDRESS_HISTORY, history);
         startService(service);
     }

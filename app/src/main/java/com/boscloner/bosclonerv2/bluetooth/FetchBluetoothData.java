@@ -172,7 +172,7 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
 
     private void sendData(byte[] data) {
         writeCharacteristic.setValue(data);
-        writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+        //writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
         deviceLiveData.writeCharacteristic(writeCharacteristic);
 
     }
@@ -222,6 +222,8 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
 
     public void writeDataToTheDevice(String macAddress) {
         customWriteGlith = false;
-        sendData(String.format(Constants.CLONE, macAddress).getBytes());
+        String command = String.format(Constants.CLONE, macAddress);
+        Timber.d("Command to write " + command + " " + command.getBytes().length);
+        sendData(command.getBytes());
     }
 }

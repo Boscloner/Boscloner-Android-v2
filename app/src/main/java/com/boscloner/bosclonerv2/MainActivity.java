@@ -222,11 +222,11 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                 .inputType(InputType.TYPE_CLASS_TEXT)
                 .input(R.string.input_hint, R.string.input_prefill, (dialog, input) -> {
                     Timber.d("user input %s", input);
-                    sendWriteInstructionToService(input, false);
+                    sendWriteInstructionToService(input.toString(), false);
                 }).show();
     }
 
-    private void sendWriteInstructionToService(CharSequence input, boolean history) {
+    private void sendWriteInstructionToService(String input, boolean history) {
         Intent service = new Intent(MainActivity.this, ForegroundService.class);
         service.setAction(Constants.Action.WRITE_MAC_ADDRESS);
         service.putExtra(Constants.Action.WRITE_MAC_ADDRESS_DATA, input);
@@ -237,6 +237,6 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     @Override
     public void onListFragmentInteraction(HistoryItem item) {
         Timber.d("On item selected " + item.deviceMacAddress + " " + item.localDateTime);
-        sendWriteInstructionToService(item.deviceMacAddress, true);
+        sendWriteInstructionToService(item.deviceMacAddress.replaceAll(":", "" ), true);
     }
 }

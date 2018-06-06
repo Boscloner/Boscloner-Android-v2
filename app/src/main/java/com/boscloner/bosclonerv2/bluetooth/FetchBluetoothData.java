@@ -70,11 +70,10 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                                     Timber.d("We found the notify characteristic, and we are trying to enable it");
                                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communication with device", "Enabling characteristic notification"));
                                     deviceLiveData.setCharacteristicNotification(characteristic, true);
-                                } else if (characteristic.getUuid().equals(SampleGattAttributes.BOSCLONER_WRITE_UUID)) {
+                                }
+                                if (characteristic.getUuid().equals(SampleGattAttributes.BOSCLONER_WRITE_UUID)) {
                                     Timber.d("We found the write characteristic, and we can use it to write data");
                                     writeCharacteristic = characteristic;
-                                } else {
-                                    Timber.d("Characteristic is not known");
                                 }
                             }
                         }

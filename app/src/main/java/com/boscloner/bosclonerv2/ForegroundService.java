@@ -105,9 +105,9 @@ public class ForegroundService extends LifecycleService {
             if (status != null) {
                 switch (status.status) {
                     case CONNECTED:
-                        SharedPreferences settings = android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
-                        boolean autoClone = settings.getBoolean(Constants.Preferences.AUTO_CLONE_KEY, false);
-                        fetchBluetoothData.onAutoCloneChanged(autoClone);
+//                        SharedPreferences settings = android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
+//                        boolean autoClone = settings.getBoolean(Constants.Preferences.AUTO_CLONE_KEY, false);
+//                        fetchBluetoothData.onAutoCloneChanged(autoClone);
                         break;
                     case ERROR:
                     case DISCONNECTED:
@@ -259,6 +259,7 @@ public class ForegroundService extends LifecycleService {
                     case Constants.Action.AUTO_CLONE_ACTION: {
                         boolean isChecked = intent.getBooleanExtra(Constants.Action.AUTO_CLONE_DATA, false);
                         fetchBluetoothData.onAutoCloneChanged(isChecked);
+                        break;
                     }
                     case Constants.Action.WRITE_MAC_ADDRESS: {
                         String macAddress = intent.getStringExtra(Constants.Action.WRITE_MAC_ADDRESS_DATA);
@@ -271,6 +272,7 @@ public class ForegroundService extends LifecycleService {
                             event.value = source + macAddress;
                             database.eventDao().addEvent(event);
                         });
+                        break;
                     }
                 }
             }

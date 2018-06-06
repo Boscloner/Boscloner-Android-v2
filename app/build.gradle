@@ -16,7 +16,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         staging {
-            signingConfig null
+            debuggable true
+            signingConfig signingConfigs.debug
             applicationIdSuffix ".staging"
             buildConfigField('String', 'BOSCLONER_SERVICE', '"0000ffe0-0000-1000-8000-00805f9b34fb"')
             buildConfigField('String', 'BOSCLONER_WRITE_CHARACTERISTIC', '"0000ffe1-0000-1000-8000-00805f9b34fb"')

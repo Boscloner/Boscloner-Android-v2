@@ -103,14 +103,14 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                                 messageFromBoscloner += messagePart;
                                 if (messageFromBoscloner.contains(DeviceCommands.SCAN.getValue()) && messageFromBoscloner.contains(DeviceCommands.END_DELIMITER.getValue())) {
                                     Timber.d("We got a SCAN message from the boscloner");
-                                    String scanDeviceAddress = messageFromBoscloner.substring(7, messageFromBoscloner.length() - 1);
+                                    String scanDeviceAddress = messageFromBoscloner.substring(7, messageFromBoscloner.length() - 3);
                                     Timber.d("SCAN: clone device scan address: %s", scanDeviceAddress);
                                     autoCloneDefault = false;
                                     messageFromBoscloner = "";
                                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.SCAN, new FetchBluetoothDataValue(scanDeviceAddress)));
                                 } else if (messageFromBoscloner.contains(DeviceCommands.CLONE.getValue()) && messageFromBoscloner.contains(DeviceCommands.END_DELIMITER.getValue())) {
                                     Timber.d("We got a CLONE message from the bosclone");
-                                    String cloneDeviceAddress = messageFromBoscloner.substring(8, messageFromBoscloner.length() - 1);
+                                    String cloneDeviceAddress = messageFromBoscloner.substring(8, messageFromBoscloner.length() - 3);
                                     Timber.d("CLONE: clone device clone address: %S", cloneDeviceAddress);
                                     autoCloneDefault = true;
                                     messageFromBoscloner = "";

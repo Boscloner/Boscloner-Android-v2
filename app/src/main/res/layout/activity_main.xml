@@ -22,18 +22,22 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.constraint.ConstraintLayout
+        android:layout_marginTop="?attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white">
 
-        <include
-            layout="@layout/content_main"
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
+            android:name="com.boscloner.bosclonerv2.MainActivityFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/text_view_activity_main_custom_write"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:layout="@layout/fragment_home" />
 
         <TextView
             android:id="@+id/text_view_activity_main_custom_write"

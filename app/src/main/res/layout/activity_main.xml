@@ -32,58 +32,12 @@
             android:name="com.boscloner.bosclonerv2.MainActivityFragment"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/text_view_activity_main_custom_write"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_navigation_view"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:layout="@layout/fragment_home" />
-
-        <TextView
-            android:id="@+id/text_view_activity_main_custom_write"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/custom_write"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@id/text_view_icon_create"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/text_view_auto_clone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/auto_clone"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@id/switch_auto_clone"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <TextView
-            android:id="@+id/text_view_icon_create"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="72dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/ic_baseline_create_24px"
-            android:clickable="true"
-            app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Switch
-            android:id="@+id/switch_auto_clone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="48dp"
-            android:layout_marginBottom="12dp"
-            app:layout_constraintBottom_toTopOf="@id/bottom_navigation_view"
-            app:layout_constraintEnd_toEndOf="parent" />
 
         <android.support.design.widget.BottomNavigationView
             android:id="@+id/bottom_navigation_view"

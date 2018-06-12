@@ -90,14 +90,14 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        setupAutoCloneSwitch();
+//        setupAutoCloneSwitch();
 
         BottomNavigationView navigationView = findViewById(R.id.bottom_navigation_view);
         navigationView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
-
-        TextView textView = findViewById(R.id.text_view_icon_create);
-        textView.setOnClickListener(v -> showInputDialog());
-
+//
+//        TextView textView = findViewById(R.id.text_view_icon_create);
+//        textView.setOnClickListener(v -> showInputDialog());
+//
         View coordinator = findViewById(R.id.coordinator);
         snackbar = Snackbar.make(coordinator, "Permission needed",
                 Snackbar.LENGTH_INDEFINITE)
@@ -111,19 +111,19 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         navigationController.navigateToHomeFragment(this);
     }
 
-    private void setupAutoCloneSwitch() {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean autoClone = settings.getBoolean(Constants.Preferences.AUTO_CLONE_KEY, false);
-
-        Switch autoCloneSwitch = findViewById(R.id.switch_auto_clone);
-        autoCloneSwitch.setChecked(autoClone);
-        autoCloneSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            Intent service = new Intent(MainActivity.this, ForegroundService.class);
-            service.setAction(Constants.Action.AUTO_CLONE_ACTION);
-            service.putExtra(Constants.Action.AUTO_CLONE_DATA, isChecked);
-            startService(service);
-        });
-    }
+//    private void setupAutoCloneSwitch() {
+//        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+//        boolean autoClone = settings.getBoolean(Constants.Preferences.AUTO_CLONE_KEY, false);
+//
+//        Switch autoCloneSwitch = findViewById(R.id.switch_auto_clone);
+//        autoCloneSwitch.setChecked(autoClone);
+//        autoCloneSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+//            Intent service = new Intent(MainActivity.this, ForegroundService.class);
+//            service.setAction(Constants.Action.AUTO_CLONE_ACTION);
+//            service.putExtra(Constants.Action.AUTO_CLONE_DATA, isChecked);
+//            startService(service);
+//        });
+//    }
 
     @Override
     public void onStart() {
@@ -215,16 +215,16 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         startService(service);
     }
 
-    private void showInputDialog() {
-        new MaterialDialog.Builder(this)
-                .title(R.string.input)
-                .content(R.string.input_content)
-                .inputType(InputType.TYPE_CLASS_TEXT)
-                .input(R.string.input_hint, R.string.input_prefill, (dialog, input) -> {
-                    Timber.d("user input %s", input);
-                    sendWriteInstructionToService(input.toString(), false);
-                }).show();
-    }
+//    private void showInputDialog() {
+//        new MaterialDialog.Builder(this)
+//                .title(R.string.input)
+//                .content(R.string.input_content)
+//                .inputType(InputType.TYPE_CLASS_TEXT)
+//                .input(R.string.input_hint, R.string.input_prefill, (dialog, input) -> {
+//                    Timber.d("user input %s", input);
+//                    sendWriteInstructionToService(input.toString(), false);
+//                }).show();
+//    }
 
     private void sendWriteInstructionToService(String input, boolean history) {
         Intent service = new Intent(MainActivity.this, ForegroundService.class);

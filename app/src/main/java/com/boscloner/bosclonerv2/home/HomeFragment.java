@@ -3,9 +3,9 @@ package com.boscloner.bosclonerv2.home;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,11 +19,9 @@ import javax.inject.Inject;
 
 public class HomeFragment extends Fragment implements Injectable {
 
-    private HomeViewModel viewModel;
-
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-
+    private HomeViewModel viewModel;
     private HomeAdapter homeAdapter;
 
     public static Fragment newInstance() {
@@ -34,21 +32,18 @@ public class HomeFragment extends Fragment implements Injectable {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
-//            linearLayoutManager.setStackFromEnd(true);
-            recyclerView.setLayoutManager(linearLayoutManager);
-            homeAdapter = new HomeAdapter();
-            homeAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-                @Override
-                public void onChanged() {
-                    linearLayoutManager.smoothScrollToPosition(recyclerView, null, homeAdapter.getItemCount());
-                }
-            });
-            recyclerView.setAdapter(homeAdapter);
-        }
+        Context context = view.getContext();
+        RecyclerView recyclerView = view.findViewById(R.id.list);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        homeAdapter = new HomeAdapter();
+        homeAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                linearLayoutManager.smoothScrollToPosition(recyclerView, null, homeAdapter.getItemCount());
+            }
+        });
+        recyclerView.setAdapter(homeAdapter);
         return view;
     }
 

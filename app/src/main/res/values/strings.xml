@@ -23,7 +23,5 @@
     <string-array name="RFID">
         <item>HID ProxCard</item>
         <item>HID Indala</item>
-        <item>EM4100</item>
-        <item>HID iClass Legacy</item>
     </string-array>
 </resources>

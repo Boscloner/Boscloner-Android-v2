@@ -45,7 +45,6 @@ public class HistoryFragment extends Fragment implements Injectable {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
-            linearLayoutManager.setStackFromEnd(true);
             recyclerView.setLayoutManager(linearLayoutManager);
             adapter = new HistoryRecyclerViewAdapter(mListener);
             recyclerView.setAdapter(adapter);

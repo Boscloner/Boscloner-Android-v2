@@ -41,14 +41,12 @@ public class HistoryFragment extends Fragment implements Injectable {
         View view = inflater.inflate(R.layout.history_fragment_item_list, container, false);
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
-            recyclerView.setLayoutManager(linearLayoutManager);
-            adapter = new HistoryRecyclerViewAdapter(mListener);
-            recyclerView.setAdapter(adapter);
-        }
+        Context context = view.getContext();
+        RecyclerView recyclerView = view.findViewById(R.id.list_history_fragment);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        adapter = new HistoryRecyclerViewAdapter(mListener);
+        recyclerView.setAdapter(adapter);
         return view;
     }
 

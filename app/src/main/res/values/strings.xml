@@ -21,6 +21,8 @@
     <string name="rfid_badge_type_default">HID ProxCard</string>
     <string name="boscloner_toolbar_title">Boscloner</string>
     <string name="boscloner_toolbar_decsription">All-In-One RFID Cloning Toolkit</string>
+    <string name="share_button_label_history_fragment">Share</string>
+    <string name="delete_button_label_history_fragment">Delete</string>
 
     <string-array name="RFID">
         <item>HID ProxCard</item>

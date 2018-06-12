@@ -3,14 +3,17 @@ package com.boscloner.bosclonerv2.history;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.boscloner.bosclonerv2.R;
 import com.boscloner.bosclonerv2.di.Injectable;
@@ -43,6 +46,14 @@ public class HistoryFragment extends Fragment implements Injectable {
         // Set the adapter
         Context context = view.getContext();
         RecyclerView recyclerView = view.findViewById(R.id.list_history_fragment);
+
+        ImageView imageView = view.findViewById(R.id.image_view_history_fragment_item_list_share);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(linearLayoutManager);
         adapter = new HistoryRecyclerViewAdapter(mListener);

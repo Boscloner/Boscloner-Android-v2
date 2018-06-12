@@ -154,7 +154,7 @@ public class ForegroundService extends LifecycleService {
                             event.type = EventType.STATUS_MCU_ENABLED;
                             event.value = "**AutoClone Status: Enabled**\n" +
                                     "**RFID Badge Type: " + "rfid badge type" + "\n" +
-                                    "----------------------------" +
+                                    "----------------------------" + "\n" +
                                     "Boscloner$ (Ready to Receive Data)";
                             database.eventDao().addEvent(event);
                         });

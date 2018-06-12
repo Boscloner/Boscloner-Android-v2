@@ -222,6 +222,8 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
 
     public void writeDataToTheDevice(String macAddress) {
         customWriteGlith = false;
-        sendData(String.format(Constants.CLONE, macAddress).getBytes());
+        String command = String.format(Constants.CLONE, macAddress);
+        Timber.d("Command to write " + command + " " + command.getBytes().length);
+        sendData(command.getBytes());
     }
 }

@@ -262,10 +262,11 @@ public class ForegroundService extends LifecycleService {
                         break;
                     }
                     case Constants.Action.WRITE_MAC_ADDRESS: {
+                        Timber.d("Mac Address %s", intent.getStringExtra(Constants.Action.WRITE_MAC_ADDRESS_DATA));
                         String macAddress = intent.getStringExtra(Constants.Action.WRITE_MAC_ADDRESS_DATA);
                         boolean fromHistory = intent.getBooleanExtra(Constants.Action.WRITE_MAC_ADDRESS_HISTORY, false);
                         fetchBluetoothData.writeDataToTheDevice(macAddress);
-                        String source = fromHistory ? "Custom ID Written: " : "Written from History: ";
+                        String source = fromHistory ? "Written from History: " : "Custom ID Written: ";
                         appExecutors.diskIO().execute(() -> {
                             Event event = new Event();
                             event.type = EventType.VALUE_WRITE;

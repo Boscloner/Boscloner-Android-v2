@@ -172,7 +172,7 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
 
     private void sendData(byte[] data) {
         writeCharacteristic.setValue(data);
-        writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+        //writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
         deviceLiveData.writeCharacteristic(writeCharacteristic);
 
     }

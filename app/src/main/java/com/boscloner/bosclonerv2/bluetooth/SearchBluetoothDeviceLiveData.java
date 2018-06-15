@@ -101,7 +101,7 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
             bluetoothAdapter = bluetoothManager.getAdapter();
             if (bluetoothAdapter != null) {
                 if (bluetoothAdapter.getState() == BluetoothAdapter.STATE_OFF) {
-                    setValue(new ActionWithDataStatus<>(SearchingStatus.ERROR,
+                    setValue(new ActionWithDataStatus<>(SearchingStatus.BLUETOOTH_OFF,
                             "Bluetooth seems to be off",
                             "Please check bluetooth connection and start the process again"));
                 }
@@ -122,17 +122,17 @@ public class SearchBluetoothDeviceLiveData extends LiveData<ActionWithDataStatus
                             bluetoothAdapter.startLeScan(leScanCallback);
                         }
                     } else {
-                        setValue(new ActionWithDataStatus<>(SearchingStatus.ERROR, "Bluetooth error", "Make sure that the bluetooth is turned on"));
+                        setValue(new ActionWithDataStatus<>(SearchingStatus.BLUETOOTH_OFF, "Bluetooth error", "Make sure that the bluetooth is turned on"));
                     }
                 } else {
-                    setValue(new ActionWithDataStatus<>(SearchingStatus.ERROR,
+                    setValue(new ActionWithDataStatus<>(SearchingStatus.BLE_NOT_SUPPORTED,
                             "Bluetooth low energy problem", "It seems that this device does not support BLE protocol"));
                 }
             } else {
-                setValue(new ActionWithDataStatus<>(SearchingStatus.ERROR, "Bluetooth error", "Could not get bluetooth adapter, please try to scan again"));
+                setValue(new ActionWithDataStatus<>(SearchingStatus.ADAPTER_ERROR, "Bluetooth error", "Could not get bluetooth adapter, please try to scan again"));
             }
         } else {
-            setValue(new ActionWithDataStatus<>(SearchingStatus.ERROR, "Bluetooth error", "This device does not have bluetooth capabilities"));
+            setValue(new ActionWithDataStatus<>(SearchingStatus.DEVICE_DOES_NOT_HAVE_BLUETOOTH_ERROR, "Bluetooth error", "This device does not have bluetooth capabilities"));
         }
     }
 

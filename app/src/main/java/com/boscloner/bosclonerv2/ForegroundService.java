@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v4.content.LocalBroadcastManager;
@@ -82,20 +81,30 @@ public class ForegroundService extends LifecycleService {
                             Timber.d("Found device %s", foundDevices.size());
                             ScanBluetoothDevice bosclonerDevice = foundDevices.get(0);
                             fetchBluetoothData.connect(bosclonerDevice.deviceMacAddress);
-                            //TODO stop scan here.
                         }
                     }
                     break;
                     case DONE: {
                         List<ScanBluetoothDevice> foundDevices = status.data;
                         if (foundDevices != null && !foundDevices.isEmpty()) {
-                            //TODO write value to the database saying we are connected.
-                            Timber.d("We have the device and we are connected");
+                            searchBluetoothDeviceLiveData.stopScan();
+                            Timber.d("Found device %s", foundDevices.size());
+                            ScanBluetoothDevice bosclonerDevice = foundDevices.get(0);
+                            fetchBluetoothData.connect(bosclonerDevice.deviceMacAddress);
                         } else {
                             searchBluetoothDeviceLiveData.startScanning();
                         }
                     }
                     break;
+                    case BLUETOOTH_OFF:
+                        //TODO ask user to turn on the bluetooth
+                        break;
+                    case ERROR:
+                    case ADAPTER_ERROR:
+                    case BLE_NOT_SUPPORTED:
+                    case DEVICE_DOES_NOT_HAVE_BLUETOOTH_ERROR:
+                        //TODO display error to the user, both as snackbar in activity, and inside notification
+                        break;
                 }
             }
         });

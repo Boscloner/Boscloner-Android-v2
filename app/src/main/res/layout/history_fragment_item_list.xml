@@ -1,13 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list"
-    android:name="com.boscloner.bosclonerv2.debug.HistoryFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    app:layoutManager="LinearLayoutManager"
-    tools:context=".HistoryFragment"
-    tools:listitem="@layout/history_fragment_item" />
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="com.boscloner.bosclonerv2.home.HistoryViewModel" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/list_history_fragment"
+            android:name="com.boscloner.bosclonerv2.debug.HistoryFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            app:layoutManager="LinearLayoutManager"
+            tools:context=".HistoryFragment"
+            tools:listitem="@layout/history_fragment_item" />
+
+        <TextView
+            android:id="@+id/text_view_history_fragment_item_list_share_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/share_button_label_history_fragment"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@id/image_view_history_fragment_item_list_share"
+            app:layout_constraintEnd_toStartOf="@id/guideline_history_fragment"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/list" />
+
+        <ImageView
+            android:id="@+id/image_view_history_fragment_item_list_share"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/guideline_history_fragment"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_view_history_fragment_item_list_share_label"
+            app:srcCompat="@drawable/ic_outline_share_24px" />
+
+        <TextView
+            android:id="@+id/text_view_history_fragment_item_list_delete_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/delete_button_label_history_fragment"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@id/image_view_history_fragment_item_list_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guideline_history_fragment"
+            app:layout_constraintTop_toBottomOf="@id/list" />
+
+        <ImageView
+            android:id="@+id/image_view_history_fragment_item_list_delete"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guideline_history_fragment"
+            app:layout_constraintTop_toBottomOf="@id/text_view_history_fragment_item_list_delete_label"
+            app:srcCompat="@drawable/ic_outline_delete_24px" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline_history_fragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

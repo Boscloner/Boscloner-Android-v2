@@ -123,6 +123,9 @@ public class ForegroundService extends LifecycleService {
                         //we start a scan again in case of some error. Need to test this more.
                         searchBluetoothDeviceLiveData.startScanning();
                         break;
+                    case BLUETOOTH_OFF:
+                        //TODO ask user to turn on the bluetooth
+                        break;
                     case SCAN:
                         if (status.data != null) {
                             notificationTitle = "Badge Captured";

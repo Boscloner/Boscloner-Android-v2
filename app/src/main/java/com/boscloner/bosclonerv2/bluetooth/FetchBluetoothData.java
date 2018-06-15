@@ -24,6 +24,7 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
 
     private DeviceLiveData deviceLiveData;
     private BluetoothGattCharacteristic writeCharacteristic;
+    private BluetoothGattCharacteristic readCharacteristic;
     private AppExecutors appExecutors;
     private String messageFromBoscloner = "";
     boolean autoCloneDefault = true;
@@ -60,6 +61,8 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                     break;
                 case SERVICES_DISCOVERY_SUCCESS:
                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communicationg with device", "Service discovery success"));
+                    boolean readCharFound = false;
+                    boolean writeCharFound = false;
                     if (s.data != null) {
                         List<BluetoothGattService> gattServiceList = s.data.bluetoothGattServices;
                         for (BluetoothGattService gattService : gattServiceList) {
@@ -68,17 +71,24 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                                 Timber.d("Gatt characteristics: %s", characteristic.getUuid());
                                 if (characteristic.getUuid().equals(SampleGattAttributes.BOSCLONER_READ_UUID)) {
                                     Timber.d("We found the notify characteristic, and we are trying to enable it");
-                                    setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CONNECTING, "Communication with device", "Enabling characteristic notification"));
-                                    deviceLiveData.setCharacteristicNotification(characteristic, true);
+                                    readCharacteristic = characteristic;
+                                    readCharFound = true;
                                 }
                                 if (characteristic.getUuid().equals(SampleGattAttributes.BOSCLONER_WRITE_UUID)) {
                                     Timber.d("We found the write characteristic, and we can use it to write data");
                                     writeCharacteristic = characteristic;
+                                    writeCharFound = true;
                                 }
                             }
                         }
                     }
-                    //TODO report error here is we don't find write and read boscloner characteristics.
+                    if (!readCharFound || !writeCharFound) {
+                        readCharacteristic = null;
+                        writeCharacteristic = null;
+                        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.ERROR, "Communicating with the device", "This device does not have proper read/write characteristics"));
+                    } else {
+                        deviceLiveData.setCharacteristicNotification(readCharacteristic, true);
+                    }
                     break;
                 case ON_CHARACTERISTIC_WRITE: {
                     if (s.data != null) {

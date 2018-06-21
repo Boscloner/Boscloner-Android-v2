@@ -39,18 +39,18 @@ public class ForegroundService extends LifecycleService {
 
     public static final String NO_PERMISSION_BROADCAST = "com.boscloner.bosclonerv2.ForgroundService.NO_PERMISSION_BROADCAST";
     public static final String STOP_SELF = "com.boscloer.bosclonerv2.ForgroundService.STOP_SELF";
+    public static final String UI_UPDATE_BROADCAST = "com.boscloner.bosclonerv2.ForgroundService.UI_UPDATE_BROADCAST";
+    public static final String UI_UPDATE_BROADCAST_KEY = "ui_update_state";
     private static Intent noPermissionBroadcast = new Intent(NO_PERMISSION_BROADCAST);
     private static Intent stopSelfIntent = new Intent(STOP_SELF);
-
+    private static Intent uiUpdateBroadcast = new Intent(UI_UPDATE_BROADCAST);
     @Inject
     public FetchBluetoothData fetchBluetoothData;
-
     @Inject
     BosclonerDatabase database;
-
     @Inject
     AppExecutors appExecutors;
-
+    private ConnectionState connectionState;
     private String notificationTitle;
     private String notificationContentText;
     private NotificationCompat.Builder notificationBuilder;
@@ -90,20 +90,34 @@ public class ForegroundService extends LifecycleService {
                             searchBluetoothDeviceLiveData.stopScan();
                             Timber.d("Found device %s", foundDevices.size());
                             ScanBluetoothDevice bosclonerDevice = foundDevices.get(0);
+                            if (connectionState == ConnectionState.CONNECTION_LOST) {
+                                connectionState = ConnectionState.ATTEMPTING_TO_RECONNECT;
+                            } else {
+                                connectionState = ConnectionState.ATTEMPTING_TO_CONNECT;
+                            }
+                            updateTheUi();
                             fetchBluetoothData.connect(bosclonerDevice.deviceMacAddress);
                         } else {
+                            if (connectionState != ConnectionState.CONNECTION_LOST) {
+                                connectionState = ConnectionState.SCANNING;
+                            }
+                            updateTheUi();
                             searchBluetoothDeviceLiveData.startScanning();
                         }
                     }
                     break;
                     case BLUETOOTH_OFF:
                         //TODO ask user to turn on the bluetooth
+                        connectionState = ConnectionState.DISCONNECTED;
+                        updateTheUi();
                         break;
                     case ERROR:
                     case ADAPTER_ERROR:
                     case BLE_NOT_SUPPORTED:
                     case DEVICE_DOES_NOT_HAVE_BLUETOOTH_ERROR:
                         //TODO display error to the user, both as snackbar in activity, and inside notification
+                        connectionState = ConnectionState.DISCONNECTED;
+                        updateTheUi();
                         break;
                 }
             }
@@ -117,14 +131,28 @@ public class ForegroundService extends LifecycleService {
 //                        SharedPreferences settings = android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
 //                        boolean autoClone = settings.getBoolean(Constants.Preferences.AUTO_CLONE_KEY, false);
 //                        fetchBluetoothData.onAutoCloneChanged(autoClone);
+                        if (connectionState == ConnectionState.ATTEMPTING_TO_RECONNECT) {
+                            connectionState = ConnectionState.RECONNECTED;
+                        } else {
+                            connectionState = ConnectionState.CONNECTED;
+                        }
+                        updateTheUi();
                         break;
                     case ERROR:
                     case DISCONNECTED:
                         //we start a scan again in case of some error. Need to test this more.
+                        if (connectionState == ConnectionState.CONNECTED) {
+                            connectionState = ConnectionState.CONNECTION_LOST;
+                        } else {
+                            connectionState = ConnectionState.SCANNING;
+                        }
+                        updateTheUi();
                         searchBluetoothDeviceLiveData.startScanning();
                         break;
                     case BLUETOOTH_OFF:
                         //TODO ask user to turn on the bluetooth
+                        connectionState = ConnectionState.DISCONNECTED;
+                        updateTheUi();
                         break;
                     case SCAN:
                         if (status.data != null) {
@@ -203,6 +231,8 @@ public class ForegroundService extends LifecycleService {
         });
 
         showNotification();
+        connectionState = ConnectionState.SCANNING;
+        updateTheUi();
         searchBluetoothDeviceLiveData.startScanning();
     }
 
@@ -290,7 +320,44 @@ public class ForegroundService extends LifecycleService {
                 }
             }
         }
+        updateTheUi();
         return START_STICKY;
+    }
+
+    private void updateTheUi() {
+        switch (connectionState) {
+            case DISCONNECTED:
+                notificationTitle = "Disconnected";
+                notificationContentText = "Boscloner device Disconnected";
+                break;
+            case SCANNING:
+                notificationTitle = "Scanning";
+                notificationContentText = "Scanning for a boslconer device";
+                break;
+            case ATTEMPTING_TO_CONNECT:
+                notificationTitle = "Connecting";
+                notificationContentText = "Attempting to connect to the boscloner device";
+                break;
+            case ATTEMPTING_TO_RECONNECT:
+                notificationTitle = "Reconnecting";
+                notificationContentText = "Attempting to reconnect to the boscloner device";
+                break;
+            case CONNECTED:
+                notificationTitle = "Connected";
+                notificationContentText = "Boscloner device connected";
+                break;
+            case RECONNECTED:
+                notificationTitle = "Connection restored";
+                notificationContentText = "Connection with the device restored";
+            case CONNECTION_LOST:
+                notificationTitle = "Connection lost";
+                notificationContentText = "Connection with the device has been lost";
+                break;
+        }
+        uiUpdateBroadcast.putExtra(UI_UPDATE_BROADCAST_KEY, connectionState);
+        if (!LocalBroadcastManager.getInstance(this).sendBroadcast(uiUpdateBroadcast)) {
+            updateNotification();
+        }
     }
 
     private void noPermission() {
@@ -337,5 +404,15 @@ public class ForegroundService extends LifecycleService {
         super.onBind(intent);
         // in case we bind to the service, we don't do that right now.
         return null;
+    }
+
+    public enum ConnectionState {
+        DISCONNECTED,
+        SCANNING,
+        ATTEMPTING_TO_CONNECT,
+        ATTEMPTING_TO_RECONNECT,
+        CONNECTED,
+        CONNECTION_LOST,
+        RECONNECTED,
     }
 }

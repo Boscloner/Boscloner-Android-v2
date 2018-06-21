@@ -29,7 +29,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:context=".HistoryFragment"
-            tools:listitem="@layout/history_fragment_item" />
+            tools:listitem="@layout/history_fragment_item"
+            tools:visibleInvisible="@{!viewModel.connectionStateProblem}" />
 
         <TextView
             android:id="@+id/text_view_fragment_home_custom_write"
@@ -41,7 +42,8 @@
             android:textColor="@color/colorPrimaryDark"
             android:textSize="24sp"
             app:layout_constraintBottom_toTopOf="@+id/text_view_fragment_home_icon_create"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibleInvisible="@{!viewModel.connectionStateProblem}" />
 
         <TextView
             android:id="@+id/text_view_fragment_home_auto_clone"
@@ -53,7 +55,8 @@
             android:textColor="@color/colorPrimaryDark"
             android:textSize="24sp"
             app:layout_constraintBottom_toTopOf="@+id/switch_auto_fragment_home_clone"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibleInvisible="@{!viewModel.connectionStateProblem}" />
 
         <TextView
             android:id="@+id/text_view_fragment_home_icon_create"
@@ -64,7 +67,8 @@
             android:background="@drawable/ic_baseline_create_24px"
             android:clickable="true"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibleInvisible="@{!viewModel.connectionStateProblem}" />
 
         <Switch
             android:id="@+id/switch_auto_fragment_home_clone"
@@ -73,7 +77,38 @@
             android:layout_marginEnd="48dp"
             android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibleInvisible="@{!viewModel.connectionStateProblem}" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/connection_state_text_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:visibleInvisible="@{viewModel.connectionStateProblem}" />
+
+        <TextView
+            android:id="@+id/connection_state_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@{viewModel.connectionStateMessage}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/progressBar"
+            tools:text="Attempting to reconnect text"
+            tools:visibleInvisible="@{viewModel.connectionStateProblem}" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

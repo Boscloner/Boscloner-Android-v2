@@ -3,6 +3,7 @@ package com.boscloner.bosclonerv2.di;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 
+import com.boscloner.bosclonerv2.SharedViewModel;
 import com.boscloner.bosclonerv2.home.HistoryViewModel;
 import com.boscloner.bosclonerv2.home.HomeViewModel;
 
@@ -22,6 +23,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(HistoryViewModel.class)
     abstract ViewModel bindHistoryViewModel(HistoryViewModel historyViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(SharedViewModel.class)
+    abstract ViewModel sharedViewModel(SharedViewModel sharedViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(BosclonerViewModelFactory factory);

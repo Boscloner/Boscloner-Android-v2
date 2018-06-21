@@ -1,32 +1,25 @@
 package com.boscloner.bosclonerv2;
 
 import android.Manifest;
-import android.app.ActivityManager;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.Switch;
-import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.boscloner.bosclonerv2.history.HistoryFragment;
 import com.boscloner.bosclonerv2.room.HistoryItem;
 import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
@@ -47,6 +40,11 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Inject
     DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
+
+    private SharedViewModel sharedViewModel;
 
     private Snackbar snackbar;
 
@@ -79,15 +77,25 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                     case ForegroundService.STOP_SELF:
                         finish();
                         break;
+                    case ForegroundService.UI_UPDATE_BROADCAST:
+                        ForegroundService.ConnectionState state = (ForegroundService.ConnectionState)
+                                i.getSerializableExtra(ForegroundService.UI_UPDATE_BROADCAST_KEY);
+                        onUiUpdated(state);
+                        break;
                 }
             }
         }
     };
 
+    private void onUiUpdated(ForegroundService.ConnectionState state) {
+        sharedViewModel.setConnectionState(state);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        sharedViewModel = ViewModelProviders.of(this, viewModelFactory).get(SharedViewModel.class);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -104,10 +112,10 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction("Grant", v -> onPermissionGranted(LOCATION_PERMISSION_REQUEST_CODE));
 
-        if (!isServiceRunning()) {
-            Intent service = new Intent(MainActivity.this, ForegroundService.class);
-            startService(service);
-        }
+        //if (!isServiceRunning()) {
+        Intent service = new Intent(MainActivity.this, ForegroundService.class);
+        startService(service);
+        //}
 
         navigationController.navigateToHomeFragment(this);
     }
@@ -129,7 +137,9 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     @Override
     public void onStart() {
         super.onStart();
-        IntentFilter filter = new IntentFilter(ForegroundService.NO_PERMISSION_BROADCAST);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ForegroundService.NO_PERMISSION_BROADCAST);
+        filter.addAction(ForegroundService.UI_UPDATE_BROADCAST);
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
                 filter);
     }
@@ -192,17 +202,17 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                         Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private boolean isServiceRunning() {
-        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        if (manager != null) {
-            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-                if (ForegroundService.class.getName().equals(service.service.getClassName())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+//    private boolean isServiceRunning() {
+//        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+//        if (manager != null) {
+//            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+//                if (ForegroundService.class.getName().equals(service.service.getClassName())) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     @Override
     public AndroidInjector<Fragment> supportFragmentInjector() {

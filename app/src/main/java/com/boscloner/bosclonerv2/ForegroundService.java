@@ -64,8 +64,8 @@ public class ForegroundService extends LifecycleService {
         AndroidInjection.inject(this);
         super.onCreate();
         connectionState = ConnectionState.LOADING;
-        updateTheUi();
         prepareNotification();
+        updateTheUi();
         readStatusAndBadgeType();
         clearTheDatabase();
         searchBluetoothDeviceLiveData = new SearchBluetoothDeviceLiveData(this);
@@ -281,6 +281,8 @@ public class ForegroundService extends LifecycleService {
                 .setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
+                .setDefaults(NotificationCompat.DEFAULT_SOUND | NotificationCompat.DEFAULT_VIBRATE)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop",
                         closePendingIntent);
     }
@@ -367,9 +369,8 @@ public class ForegroundService extends LifecycleService {
                 break;
         }
         uiUpdateBroadcast.putExtra(UI_UPDATE_BROADCAST_KEY, connectionState);
-        if (!LocalBroadcastManager.getInstance(this).sendBroadcast(uiUpdateBroadcast)) {
-            updateNotification();
-        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(uiUpdateBroadcast);
+        updateNotification();
     }
 
     private void noPermission() {
@@ -384,7 +385,7 @@ public class ForegroundService extends LifecycleService {
         notificationBuilder.setContentTitle(notificationTitle)
                 .setTicker(notificationTitle)
                 .setContentText(notificationContentText);
-        notificationManager.notify(Constants.NotificationId.FOREGROUND_SERVICE, notificationBuilder.build());
+        startForeground(Constants.NotificationId.FOREGROUND_SERVICE, notificationBuilder.build());
     }
 
     private void showNotification() {
@@ -401,7 +402,7 @@ public class ForegroundService extends LifecycleService {
                 // the NotificationChannel class is new and not in the support library
                 CharSequence name = getString(R.string.channel_name);
                 String description = getString(R.string.channel_description);
-                NotificationChannel channel = new NotificationChannel(Constants.NotificationId.CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
+                NotificationChannel channel = new NotificationChannel(Constants.NotificationId.CHANNEL_ID, name, NotificationManager.IMPORTANCE_HIGH);
                 channel.setDescription(description);
                 channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
                 // Register the channel with the system

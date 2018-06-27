@@ -33,6 +33,7 @@ public class BosclonerApp extends Application implements HasActivityInjector, Ha
         AppInjector.init(this);
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
+        } else {
             Fabric.with(this, new Crashlytics());
         }
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);

@@ -30,6 +30,10 @@
             </intent-filter>
         </activity>
         <service android:name=".ForegroundService" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="c3ff5c2b2a967991276abe4bf41115c1614bcfe3" />
     </application>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

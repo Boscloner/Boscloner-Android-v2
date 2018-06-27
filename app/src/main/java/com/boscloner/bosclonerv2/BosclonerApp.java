@@ -6,8 +6,10 @@ import android.app.Service;
 import android.support.v7.preference.PreferenceManager;
 
 import com.boscloner.bosclonerv2.di.AppInjector;
+import com.crashlytics.android.Crashlytics;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
+import io.fabric.sdk.android.Fabric;
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjector;
@@ -31,6 +33,7 @@ public class BosclonerApp extends Application implements HasActivityInjector, Ha
         AppInjector.init(this);
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
+            Fabric.with(this, new Crashlytics());
         }
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }

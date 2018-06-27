@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
-            android:background="@android:color/white"
+            android:background="@android:color/black"
             app:layoutManager="LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/text_view_fragment_home_custom_write"
             app:layout_constraintEnd_toEndOf="parent"

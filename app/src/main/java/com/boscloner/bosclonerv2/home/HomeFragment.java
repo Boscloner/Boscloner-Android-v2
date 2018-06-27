@@ -77,7 +77,7 @@ public class HomeFragment extends Fragment implements Injectable {
     }
 
     private void setupWriteButton() {
-        dataBinding.textViewFragmentHomeCustomWrite.setOnClickListener(v -> sharedViewModel.onCustomWriteClick());
+        dataBinding.textViewFragmentHomeIconCreate.setOnClickListener(v -> sharedViewModel.onCustomWriteClick());
     }
 
     private void setupAutoCloneSwitch() {
@@ -87,7 +87,9 @@ public class HomeFragment extends Fragment implements Injectable {
 
             Switch autoCloneSwitch = dataBinding.switchAutoFragmentHomeClone;
             autoCloneSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                sharedViewModel.onAutoCloneClicked(isChecked);
+                if (sharedViewModel != null) {
+                    sharedViewModel.onAutoCloneClicked(isChecked);
+                }
             });
             autoCloneSwitch.setChecked(autoClone);
         }

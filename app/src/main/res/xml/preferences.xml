@@ -7,7 +7,7 @@
         android:title="@string/settings_autoclone">
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="pref_key_enable_autoclone"
+            android:key="preferences_auto_clone_key"
             android:title="@string/settings_autoclone_status" />
     </PreferenceCategory>
 

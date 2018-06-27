@@ -17,6 +17,9 @@ public interface HistoryItemDao {
     @Insert(onConflict = REPLACE)
     void add(HistoryItem item);
 
+    @Query("select group_concat(deviceMacAddress) from " + HistoryItem.TABLE_NAME + " order by datetime(localDateTime)")
+    String deviceMacAddresses();
+
     @Query("delete from " + HistoryItem.TABLE_NAME)
     void clearTable();
 }

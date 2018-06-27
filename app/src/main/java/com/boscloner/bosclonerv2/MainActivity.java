@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -20,10 +21,14 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.boscloner.bosclonerv2.history.HistoryFragment;
+import com.boscloner.bosclonerv2.room.BosclonerDatabase;
 import com.boscloner.bosclonerv2.room.HistoryItem;
+import com.boscloner.bosclonerv2.util.AppExecutors;
 import com.boscloner.bosclonerv2.util.permissions_fragment.PermissionsFragment;
 
 import javax.inject.Inject;
@@ -45,6 +50,12 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
+
+    @Inject
+    AppExecutors appExecutors;
+
+    @Inject
+    BosclonerDatabase bosclonerDatabase;
 
     private SharedViewModel sharedViewModel;
 
@@ -241,5 +252,54 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     public void onListFragmentInteraction(HistoryItem item) {
         Timber.d("On item selected " + item.deviceMacAddress + " " + item.localDateTime);
         sendWriteInstructionToService(item.deviceMacAddress.replaceAll(":", ""), true);
+    }
+
+    @Override
+    public void shareItems() {
+        appExecutors.diskIO().execute(() -> {
+            String macAddresses = bosclonerDatabase.historyItemDao().deviceMacAddresses();
+            appExecutors.mainThread().execute(() -> {
+                shareMacAddresses(macAddresses);
+            });
+        });
+    }
+
+    private void shareMacAddresses(String macAddresses) {
+        if (macAddresses == null || macAddresses.isEmpty()) {
+            Toast.makeText(this, R.string.nothing_to_share, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, macAddresses);
+        sendIntent.setType("text/plain");
+        if (sendIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(sendIntent);
+        } else {
+            Toast.makeText(this, R.string.no_app_that_can_share, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void clearHistory() {
+        showDeleteHistoryDialog();
+    }
+
+    private void showDeleteHistoryDialog() {
+        new MaterialDialog.Builder(this)
+                .title(R.string.delete_history)
+                .content(R.string.delete_history_dialog_content)
+                .positiveText(R.string.ok)
+                .negativeText(R.string.cancel)
+                .onPositive((dialog, which) -> {
+                    clearHistoryDatabase();
+                })
+                .show();
+    }
+
+    private void clearHistoryDatabase() {
+        appExecutors.diskIO().execute(() -> {
+            bosclonerDatabase.historyItemDao().clearTable();
+        });
     }
 }

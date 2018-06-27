@@ -16,9 +16,9 @@ import javax.inject.Inject;
 
 public class HomeViewModel extends ViewModel {
 
-    private BosclonerDatabase database;
     public ObservableBoolean connectionStateProblem;
     public ObservableField<String> connectionStateMessage;
+    private BosclonerDatabase database;
 
     @Inject
     public HomeViewModel(@NonNull BosclonerDatabase database) {
@@ -33,6 +33,10 @@ public class HomeViewModel extends ViewModel {
 
     public void setConnectionStateProblem(ForegroundService.ConnectionState events) {
         switch (events) {
+            case LOADING:
+                connectionStateProblem.set(true);
+                connectionStateMessage.set("Boscloner is starting up");
+                break;
             case DISCONNECTED:
                 connectionStateProblem.set(true);
                 connectionStateMessage.set("Device disconnected");

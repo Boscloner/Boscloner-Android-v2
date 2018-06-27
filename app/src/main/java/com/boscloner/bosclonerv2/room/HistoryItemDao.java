@@ -16,4 +16,7 @@ public interface HistoryItemDao {
 
     @Insert(onConflict = REPLACE)
     void add(HistoryItem item);
+
+    @Query("delete from " + HistoryItem.TABLE_NAME)
+    void clearTable();
 }

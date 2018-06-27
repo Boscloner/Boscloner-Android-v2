@@ -63,8 +63,11 @@ public class ForegroundService extends LifecycleService {
     public void onCreate() {
         AndroidInjection.inject(this);
         super.onCreate();
+        connectionState = ConnectionState.LOADING;
+        updateTheUi();
         prepareNotification();
         readStatusAndBadgeType();
+        clearTheDatabase();
         searchBluetoothDeviceLiveData = new SearchBluetoothDeviceLiveData(this);
         this.searchBluetoothDeviceLiveData.observe(this, status -> {
             Timber.d("Scan data stats %s", status);
@@ -229,8 +232,17 @@ public class ForegroundService extends LifecycleService {
                 }
             }
         });
-
         showNotification();
+    }
+
+    private void clearTheDatabase() {
+        appExecutors.diskIO().execute(() -> {
+            database.eventDao().clearTable();
+            appExecutors.mainThread().execute(this::startScanning);
+        });
+    }
+
+    private void startScanning() {
         connectionState = ConnectionState.SCANNING;
         updateTheUi();
         searchBluetoothDeviceLiveData.startScanning();
@@ -407,6 +419,7 @@ public class ForegroundService extends LifecycleService {
     }
 
     public enum ConnectionState {
+        LOADING,
         DISCONNECTED,
         SCANNING,
         ATTEMPTING_TO_CONNECT,

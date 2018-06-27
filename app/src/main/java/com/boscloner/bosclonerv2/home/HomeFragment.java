@@ -2,7 +2,6 @@ package com.boscloner.bosclonerv2.home;
 
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -16,11 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Switch;
-import android.widget.TextView;
 
 import com.boscloner.bosclonerv2.Constants;
-import com.boscloner.bosclonerv2.ForegroundService;
-import com.boscloner.bosclonerv2.MainActivity;
 import com.boscloner.bosclonerv2.R;
 import com.boscloner.bosclonerv2.SharedViewModel;
 import com.boscloner.bosclonerv2.databinding.FragmentHomeBinding;
@@ -32,11 +28,10 @@ public class HomeFragment extends Fragment implements Injectable {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
+    FragmentHomeBinding dataBinding;
     private HomeViewModel viewModel;
     private SharedViewModel sharedViewModel;
     private HomeAdapter homeAdapter;
-
-    FragmentHomeBinding dataBinding;
 
     public static Fragment newInstance() {
         return new HomeFragment();
@@ -62,7 +57,8 @@ public class HomeFragment extends Fragment implements Injectable {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) { super.onActivityCreated(savedInstanceState);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(HomeViewModel.class);
         dataBinding.setViewModel(viewModel);
         setupAutoCloneSwitch();

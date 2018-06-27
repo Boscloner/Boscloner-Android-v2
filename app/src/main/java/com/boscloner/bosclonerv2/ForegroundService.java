@@ -116,6 +116,7 @@ public class ForegroundService extends LifecycleService {
                         updateTheUi();
                         break;
                     case ERROR:
+                        Timber.d("Error while scanning please try again");
                         connectionState = ConnectionState.SCANNING;
                         updateTheUi();
                         startScanning();

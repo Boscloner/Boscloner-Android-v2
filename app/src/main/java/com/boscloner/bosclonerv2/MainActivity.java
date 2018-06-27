@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        registerServiceBroadcastReceiver();
         sharedViewModel = ViewModelProviders.of(this, viewModelFactory).get(SharedViewModel.class);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -131,19 +132,18 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         navigationController.navigateToHomeFragment(this);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
+    private void registerServiceBroadcastReceiver() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ForegroundService.NO_PERMISSION_BROADCAST);
+        filter.addAction(ForegroundService.STOP_SELF);
         filter.addAction(ForegroundService.UI_UPDATE_BROADCAST);
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
                 filter);
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onDestroy() {
+        super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 

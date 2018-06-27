@@ -35,35 +35,35 @@ public class HomeViewModel extends ViewModel {
         switch (events) {
             case LOADING:
                 connectionStateProblem.set(true);
-                connectionStateMessage.set("Boscloner is starting up");
+                connectionStateMessage.set("Boscloner is Starting up");
                 break;
             case DISCONNECTED:
                 connectionStateProblem.set(true);
-                connectionStateMessage.set("Device disconnected");
+                connectionStateMessage.set("Device Disconnected");
                 break;
             case ATTEMPTING_TO_CONNECT:
                 connectionStateProblem.set(true);
-                connectionStateMessage.set("Attempting to connect");
+                connectionStateMessage.set("Attempting to Connect");
                 break;
             case ATTEMPTING_TO_RECONNECT:
                 connectionStateProblem.set(true);
-                connectionStateMessage.set("Attempting to reconnect");
+                connectionStateMessage.set("Attempting to Reconnect");
                 break;
             case CONNECTION_LOST:
                 connectionStateProblem.set(true);
-                connectionStateMessage.set("Connection lost");
+                connectionStateMessage.set("Connection Lost");
                 break;
             case SCANNING:
                 connectionStateProblem.set(true);
-                connectionStateMessage.set("Scanning for device");
+                connectionStateMessage.set("Scanning for Device");
                 break;
             case CONNECTED:
                 connectionStateProblem.set(false);
-                connectionStateMessage.set("Device connected");
+                connectionStateMessage.set("Device Connected");
                 break;
             case RECONNECTED:
                 connectionStateProblem.set(false);
-                connectionStateMessage.set("Device reconnected");
+                connectionStateMessage.set("Device Reconnected");
                 break;
         }
     }

@@ -199,9 +199,8 @@ public class ForegroundService extends LifecycleService {
                         appExecutors.diskIO().execute(() -> {
                             Event event = new Event();
                             event.type = EventType.STATUS_MCU_ENABLED;
-                            event.value = "**AutoClone Status: Enabled**\n" +
-                                    "**RFID Badge Type: " + "rfid badge type" + "\n" +
-                                    "----------------------------" + "\n" +
+                            event.value = "**RFID Badge Type: " + "RFID badge type" + "\n" +
+                                    "----------------------------\n" +
                                     "Boscloner$ (Ready to Receive Data)";
                             database.eventDao().addEvent(event);
                         });
@@ -210,9 +209,8 @@ public class ForegroundService extends LifecycleService {
                         appExecutors.diskIO().execute(() -> {
                             Event event = new Event();
                             event.type = EventType.STATUS_MCU_DISABLED;
-                            event.value = "**AutoClone Status: Disabled**\n" +
-                                    "**RFID Badge Type: " + "rfid badge type" + "\n" +
-                                    "----------------------------" +
+                            event.value = "**RFID Badge Type: " + "RFID badge type" + "\n" +
+                                    "----------------------------\n" +
                                     "Boscloner$ (Ready to Receive Data)";
                             database.eventDao().addEvent(event);
                         });
@@ -357,26 +355,26 @@ public class ForegroundService extends LifecycleService {
                 break;
             case SCANNING:
                 notificationTitle = "Scanning";
-                notificationContentText = "Scanning for a boslconer device";
+                notificationContentText = "Scanning for a Boslconer device";
                 break;
             case ATTEMPTING_TO_CONNECT:
                 notificationTitle = "Connecting";
-                notificationContentText = "Attempting to connect to the boscloner device";
+                notificationContentText = "Attempting to Connect to the Boscloner device";
                 break;
             case ATTEMPTING_TO_RECONNECT:
                 notificationTitle = "Reconnecting";
-                notificationContentText = "Attempting to reconnect to the boscloner device";
+                notificationContentText = "Attempting to Reconnect to the Boscloner device";
                 break;
             case CONNECTED:
                 notificationTitle = "Connected";
-                notificationContentText = "Boscloner device connected";
+                notificationContentText = "Boscloner Device Connected";
                 break;
             case RECONNECTED:
-                notificationTitle = "Connection restored";
-                notificationContentText = "Connection with the device restored";
+                notificationTitle = "Connection Restored";
+                notificationContentText = "Connection with the Device Restored";
             case CONNECTION_LOST:
-                notificationTitle = "Connection lost";
-                notificationContentText = "Connection with the device has been lost";
+                notificationTitle = "Connection Lost";
+                notificationContentText = "Connection with the Device has been Lost";
                 break;
         }
         uiUpdateBroadcast.putExtra(UI_UPDATE_BROADCAST_KEY, connectionState);
@@ -387,8 +385,8 @@ public class ForegroundService extends LifecycleService {
 
     private void noPermission() {
         if (!LocalBroadcastManager.getInstance(this).sendBroadcast(noPermissionBroadcast)) {
-            notificationTitle = "No permission";
-            notificationContentText = "Boscloner requires permission to run";
+            notificationTitle = "No Permission";
+            notificationContentText = "Boscloner Requires Permission to Run";
             updateNotification();
         }
     }

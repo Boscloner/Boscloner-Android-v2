@@ -128,9 +128,9 @@ public class ForegroundService extends LifecycleService {
             if (status != null) {
                 switch (status.status) {
                     case CONNECTED:
-//                        SharedPreferences settings = android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
-//                        boolean autoClone = settings.getBoolean(Constants.Preferences.AUTO_CLONE_KEY, false);
-//                        fetchBluetoothData.onAutoCloneChanged(autoClone);
+                        SharedPreferences settings = android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
+                        boolean autoClone = settings.getBoolean(Constants.Preferences.AUTO_CLONE_KEY, false);
+                        fetchBluetoothData.onAutoCloneChanged(autoClone);
                         if (connectionState == ConnectionState.ATTEMPTING_TO_RECONNECT) {
                             connectionState = ConnectionState.RECONNECTED;
                         } else {

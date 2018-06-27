@@ -2,17 +2,25 @@ package com.boscloner.bosclonerv2.home;
 
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Switch;
+import android.widget.TextView;
 
+import com.boscloner.bosclonerv2.Constants;
+import com.boscloner.bosclonerv2.ForegroundService;
+import com.boscloner.bosclonerv2.MainActivity;
 import com.boscloner.bosclonerv2.R;
 import com.boscloner.bosclonerv2.SharedViewModel;
 import com.boscloner.bosclonerv2.databinding.FragmentHomeBinding;
@@ -25,6 +33,7 @@ public class HomeFragment extends Fragment implements Injectable {
     @Inject
     ViewModelProvider.Factory viewModelFactory;
     private HomeViewModel viewModel;
+    private SharedViewModel sharedViewModel;
     private HomeAdapter homeAdapter;
 
     FragmentHomeBinding dataBinding;
@@ -56,7 +65,9 @@ public class HomeFragment extends Fragment implements Injectable {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) { super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(HomeViewModel.class);
         dataBinding.setViewModel(viewModel);
-        SharedViewModel sharedViewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(SharedViewModel.class);
+        setupAutoCloneSwitch();
+        setupWriteButton();
+        sharedViewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(SharedViewModel.class);
         viewModel.getEvents().observe(this, events -> {
             if (events != null) {
                 homeAdapter.setEvents(events);
@@ -67,5 +78,22 @@ public class HomeFragment extends Fragment implements Injectable {
                 viewModel.setConnectionStateProblem(events);
             }
         });
+    }
+
+    private void setupWriteButton() {
+        dataBinding.textViewFragmentHomeCustomWrite.setOnClickListener(v -> sharedViewModel.onCustomWriteClick());
+    }
+
+    private void setupAutoCloneSwitch() {
+        if (getContext() != null) {
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getContext());
+            boolean autoClone = settings.getBoolean(Constants.Preferences.AUTO_CLONE_KEY, false);
+
+            Switch autoCloneSwitch = dataBinding.switchAutoFragmentHomeClone;
+            autoCloneSwitch.setChecked(autoClone);
+            autoCloneSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                sharedViewModel.onAutoCloneClicked(isChecked);
+            });
+        }
     }
 }

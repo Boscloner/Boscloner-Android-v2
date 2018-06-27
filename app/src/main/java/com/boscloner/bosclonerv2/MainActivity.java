@@ -228,8 +228,10 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                 .content(R.string.input_content)
                 .inputType(InputType.TYPE_CLASS_TEXT)
                 .input(R.string.input_hint, R.string.input_prefill, (dialog, input) -> {
-                    Timber.d("user input %s", input);
-                    sendWriteInstructionToService(input.toString(), false);
+                    if (input != null && input.length() != 0) {
+                        Timber.d("user input %s", input);
+                        sendWriteInstructionToService(input.toString(), false);
+                    }
                 }).show();
     }
 

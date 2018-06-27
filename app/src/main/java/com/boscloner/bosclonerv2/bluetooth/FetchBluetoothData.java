@@ -165,12 +165,18 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                     Timber.d("Device disconnected");
                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.DISCONNECTED, "Device disconnected"));
                     //since we are over with this connection, clear the value, so when we next attach we don't get disconnect right away.
+                    writeCharacteristic = null;
+                    readCharacteristic = null;
                     setValue(null);
                     break;
                 case ERROR:
+                    writeCharacteristic = null;
+                    readCharacteristic = null;
                     Timber.d("Device error");
                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.ERROR, s.message_title, s.message_body));
                 case BLUETOOTH_OFF:
+                    writeCharacteristic = null;
+                    readCharacteristic = null;
                     Timber.d("Blutooth off");
                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.BLUETOOTH_OFF, s.message_title, s.message_body));
                     setValue(null);
@@ -215,25 +221,29 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     }
 
     public void onAutoCloneChanged(boolean isChecked) {
-        if (isChecked && !autoCloneDefault) {
-            customWriteGlitch = true;
-            sendData(Constants.ENABLE_CLONE.getBytes());
-            autoCloneDefault = true;
-            setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_ENABLED, new FetchBluetoothDataValue("")));
-        } else if (!isChecked && autoCloneDefault) {
-            customWriteGlitch = true;
-            sendData(Constants.DISABLE_CLONE.getBytes());
-            autoCloneDefault = false;
-            setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_DISABLED, new FetchBluetoothDataValue("")));
-        } else {
-            Timber.d("Auto clone is already on the proper value");
+        if (writeCharacteristic != null) {
+            if (isChecked && !autoCloneDefault) {
+                customWriteGlitch = true;
+                sendData(Constants.ENABLE_CLONE.getBytes());
+                autoCloneDefault = true;
+                setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_ENABLED, new FetchBluetoothDataValue("")));
+            } else if (!isChecked && autoCloneDefault) {
+                customWriteGlitch = true;
+                sendData(Constants.DISABLE_CLONE.getBytes());
+                autoCloneDefault = false;
+                setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_DISABLED, new FetchBluetoothDataValue("")));
+            } else {
+                Timber.d("Auto clone is already on the proper value");
+            }
         }
     }
 
     public void writeDataToTheDevice(String macAddress) {
-        customWriteGlitch = false;
-        String command = String.format(Constants.CLONE, macAddress);
-        Timber.d("Command to write " + command + " " + command.getBytes().length);
-        sendData(command.getBytes());
+        if (writeCharacteristic != null) {
+            customWriteGlitch = false;
+            String command = String.format(Constants.CLONE, macAddress);
+            Timber.d("Command to write " + command + " " + command.getBytes().length);
+            sendData(command.getBytes());
+        }
     }
 }

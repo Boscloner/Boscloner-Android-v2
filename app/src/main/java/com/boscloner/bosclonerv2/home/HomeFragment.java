@@ -86,10 +86,10 @@ public class HomeFragment extends Fragment implements Injectable {
             boolean autoClone = settings.getBoolean(Constants.Preferences.AUTO_CLONE_KEY, false);
 
             Switch autoCloneSwitch = dataBinding.switchAutoFragmentHomeClone;
-            autoCloneSwitch.setChecked(autoClone);
             autoCloneSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 sharedViewModel.onAutoCloneClicked(isChecked);
             });
+            autoCloneSwitch.setChecked(autoClone);
         }
     }
 }

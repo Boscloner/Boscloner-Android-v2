@@ -58,6 +58,7 @@ public class ForegroundService extends LifecycleService {
     private SearchBluetoothDeviceLiveData searchBluetoothDeviceLiveData;
     private RFIDBadgeType badgeType;
     private boolean autoCloneSetting;
+    private boolean autoClone;
 
     @Override
     public void onCreate() {
@@ -115,6 +116,10 @@ public class ForegroundService extends LifecycleService {
                         updateTheUi();
                         break;
                     case ERROR:
+                        connectionState = ConnectionState.SCANNING;
+                        updateTheUi();
+                        startScanning();
+                        break;
                     case ADAPTER_ERROR:
                     case BLE_NOT_SUPPORTED:
                     case DEVICE_DOES_NOT_HAVE_BLUETOOTH_ERROR:
@@ -131,8 +136,6 @@ public class ForegroundService extends LifecycleService {
             if (status != null) {
                 switch (status.status) {
                     case CONNECTED:
-                        SharedPreferences settings = android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this);
-                        boolean autoClone = settings.getBoolean(Constants.Preferences.AUTO_CLONE_KEY, false);
                         fetchBluetoothData.onAutoCloneChanged(autoClone);
                         if (connectionState == ConnectionState.ATTEMPTING_TO_RECONNECT) {
                             connectionState = ConnectionState.RECONNECTED;
@@ -296,6 +299,8 @@ public class ForegroundService extends LifecycleService {
                 switch (action) {
                     case Constants.Action.STOPFOREGROUND_ACTION: {
                         Timber.i("Received Stop Foreground Intent");
+                        searchBluetoothDeviceLiveData.stopScan();
+                        fetchBluetoothData.disconnect();
                         LocalBroadcastManager.getInstance(this).sendBroadcast(stopSelfIntent);
                         stopForeground(true);
                         stopSelf();
@@ -314,6 +319,7 @@ public class ForegroundService extends LifecycleService {
                     }
                     case Constants.Action.AUTO_CLONE_ACTION: {
                         boolean isChecked = intent.getBooleanExtra(Constants.Action.AUTO_CLONE_DATA, false);
+                        autoClone = isChecked;
                         fetchBluetoothData.onAutoCloneChanged(isChecked);
                         break;
                     }
@@ -369,8 +375,9 @@ public class ForegroundService extends LifecycleService {
                 break;
         }
         uiUpdateBroadcast.putExtra(UI_UPDATE_BROADCAST_KEY, connectionState);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(uiUpdateBroadcast);
-        updateNotification();
+        if (!LocalBroadcastManager.getInstance(this).sendBroadcast(uiUpdateBroadcast)) {
+            updateNotification();
+        }
     }
 
     private void noPermission() {

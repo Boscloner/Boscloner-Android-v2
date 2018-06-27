@@ -68,6 +68,6 @@ fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
 
-app/relese
+app/release
 keystore.properties
 key.jks

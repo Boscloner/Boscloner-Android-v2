@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -23,7 +22,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.boscloner.bosclonerv2.history.HistoryFragment;
 import com.boscloner.bosclonerv2.room.BosclonerDatabase;
@@ -227,11 +225,9 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                 .title(R.string.input)
                 .content(R.string.input_content)
                 .inputType(InputType.TYPE_CLASS_TEXT)
-                .input(R.string.input_hint, R.string.input_prefill, (dialog, input) -> {
-                    if (input != null && input.length() != 0) {
-                        Timber.d("user input %s", input);
-                        sendWriteInstructionToService(input.toString(), false);
-                    }
+                .input(R.string.input_hint, R.string.input_prefill, false, (dialog, input) -> {
+                    Timber.d("user input %s", input);
+                    sendWriteInstructionToService(input.toString(), false);
                 }).show();
     }
 
@@ -253,16 +249,26 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     @Override
     public void onListFragmentInteraction(HistoryItem item) {
         Timber.d("On item selected " + item.deviceMacAddress + " " + item.localDateTime);
-        sendWriteInstructionToService(item.deviceMacAddress.replaceAll(":", ""), true);
+        writeFromHistoryDialog(item.deviceMacAddress.replaceAll(":", ""));
     }
+
+    private void writeFromHistoryDialog(String macAddress) {
+        new MaterialDialog.Builder(this)
+                .title(R.string.history_input)
+                .content(R.string.history_input_content)
+                .inputType(InputType.TYPE_CLASS_TEXT)
+                .input(getString(R.string.input_hint), macAddress, false, (dialog, input) -> {
+                    Timber.d("user input %s", input);
+                    sendWriteInstructionToService(input.toString(), true);
+                }).show();
+    }
+
 
     @Override
     public void shareItems() {
         appExecutors.diskIO().execute(() -> {
             String macAddresses = bosclonerDatabase.historyItemDao().deviceMacAddresses();
-            appExecutors.mainThread().execute(() -> {
-                shareMacAddresses(macAddresses);
-            });
+            appExecutors.mainThread().execute(() -> shareMacAddresses(macAddresses));
         });
     }
 
@@ -293,15 +299,11 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                 .content(R.string.delete_history_dialog_content)
                 .positiveText(R.string.ok)
                 .negativeText(R.string.cancel)
-                .onPositive((dialog, which) -> {
-                    clearHistoryDatabase();
-                })
+                .onPositive((dialog, which) -> clearHistoryDatabase())
                 .show();
     }
 
     private void clearHistoryDatabase() {
-        appExecutors.diskIO().execute(() -> {
-            bosclonerDatabase.historyItemDao().clearTable();
-        });
+        appExecutors.diskIO().execute(() -> bosclonerDatabase.historyItemDao().clearTable());
     }
 }

@@ -335,6 +335,10 @@ public class ForegroundService extends LifecycleService {
                             event.type = EventType.VALUE_WRITE;
                             event.value = source + macAddress;
                             database.eventDao().addEvent(event);
+                            HistoryItem historyItem = new HistoryItem();
+                            historyItem.localDateTime = LocalDateTime.now();
+                            historyItem.deviceMacAddress = macAddress;
+                            database.historyItemDao().add(historyItem);
                         });
                         break;
                     }

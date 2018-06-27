@@ -29,6 +29,8 @@
     <string name="ok">OK</string>
     <string name="no_app_that_can_share">There is no app that can share text on your phone.</string>
     <string name="nothing_to_share">Nothing to share.</string>
+    <string name="history_input">Write from history</string>
+    <string name="history_input_content">Are you sure you want to write this from history?</string>
 
     <string-array name="RFID">
         <item>HID ProxCard</item>

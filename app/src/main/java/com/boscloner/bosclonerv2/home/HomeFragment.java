@@ -61,9 +61,9 @@ public class HomeFragment extends Fragment implements Injectable {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(HomeViewModel.class);
         dataBinding.setViewModel(viewModel);
+        sharedViewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(SharedViewModel.class);
         setupAutoCloneSwitch();
         setupWriteButton();
-        sharedViewModel = ViewModelProviders.of(getActivity(), viewModelFactory).get(SharedViewModel.class);
         viewModel.getEvents().observe(this, events -> {
             if (events != null) {
                 homeAdapter.setEvents(events);

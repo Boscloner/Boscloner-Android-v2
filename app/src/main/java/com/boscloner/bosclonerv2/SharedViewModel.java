@@ -36,7 +36,6 @@ public class SharedViewModel extends ViewModel {
     public void onAutoCloneClicked(boolean isChecked) {
         homeFragmentActionsMutableLiveData.setValue(isChecked ? HomeFragmentActions.AUTO_CLONE_ON :
                 HomeFragmentActions.AUTO_CLONE_OFF);
-        homeFragmentActionsMutableLiveData.setValue(null);
     }
 
     public enum HomeFragmentActions {

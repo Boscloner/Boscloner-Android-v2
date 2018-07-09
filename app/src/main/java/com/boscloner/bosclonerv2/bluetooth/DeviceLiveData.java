@@ -70,7 +70,7 @@ class DeviceLiveData extends MutableLiveData<ActionWithDataStatus<BluetoothDevic
                                           BluetoothGattCharacteristic characteristic, int status) {
             Timber.d("On characteristic write");
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.ON_CHARACTERISTIC_WRITE));
+                setMessage(new ActionWithDataStatus<>(BluetoothDeviceStatus.ON_CHARACTERISTIC_WRITE, BluetoothDeviceData.newInstance(characteristic)));
             } else {
                 Timber.e("onCharacteristic write problem: %s", status);
             }

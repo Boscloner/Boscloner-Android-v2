@@ -3,9 +3,11 @@ package com.boscloner.bosclonerv2.bluetooth;
 import android.arch.lifecycle.MediatorLiveData;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.graphics.Bitmap;
 import android.support.annotation.MainThread;
 import android.text.TextUtils;
 
+import com.boscloner.bosclonerv2.BuildConfig;
 import com.boscloner.bosclonerv2.Constants;
 import com.boscloner.bosclonerv2.util.ActionWithDataStatus;
 import com.boscloner.bosclonerv2.util.AppExecutors;
@@ -31,6 +33,9 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     boolean customWriteGlitch = true;
     boolean firstRun = true;
     boolean writeFromHistoryFile = false;
+    boolean multipart = false;
+    int multipartIndex = 0;
+    byte[] multipartData;
 
     @Inject
     public FetchBluetoothData(DeviceLiveData deviceLiveData, AppExecutors appExecutors) {
@@ -92,7 +97,13 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                     break;
                 case ON_CHARACTERISTIC_WRITE: {
                     if (s.data != null) {
-                        Timber.d("write char UUID: ");
+                        Timber.d("Characteristic write: %s", s.data.bluetoothGattCharacteristic);
+                        if (s.data.bluetoothGattCharacteristic.getUuid().equals(SampleGattAttributes.BOSCLONER_WRITE_UUID)) {
+                            if (multipart) {
+                                multipartIndex += 20;
+                                sendMultipartData();
+                            }
+                        }
                     }
                 }
                 break;
@@ -187,10 +198,37 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     }
 
     private void sendData(byte[] data) {
-        writeCharacteristic.setValue(data);
-        //writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-        deviceLiveData.writeCharacteristic(writeCharacteristic);
+        if (data.length < 20) {
+            multipart = false;
+            multipartIndex = 0;
+            writeCharacteristic.setValue(data);
+            writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+            deviceLiveData.writeCharacteristic(writeCharacteristic);
+        } else {
+            multipart = true;
+            multipartIndex = 0;
+            multipartData = data;
+            sendMultipartData();
+        }
+    }
 
+    private void sendMultipartData() {
+        if (multipartIndex >= multipartData.length) {
+            Timber.d("Everything ok, lets try to notify that the message has been sent");
+            multipartData = null;
+            multipart = false;
+            multipartIndex = 0;
+            return;
+        }
+        int partSize = 20;
+        if (multipartIndex + partSize > multipartData.length) {
+            partSize = multipartData.length - multipartIndex;
+        }
+        byte[] part = new byte[partSize];
+        System.arraycopy(multipartData, multipartIndex, part, 0, partSize);
+        writeCharacteristic.setValue(part);
+        writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+        deviceLiveData.writeCharacteristic(writeCharacteristic);
     }
 
     @MainThread

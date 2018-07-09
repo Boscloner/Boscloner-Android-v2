@@ -1,5 +1,6 @@
 package com.boscloner.bosclonerv2.bluetooth;
 
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 
@@ -9,6 +10,7 @@ public class BluetoothDeviceData {
     public List<BluetoothGattService> bluetoothGattServices;
     public byte[] value;
     public BluetoothGattDescriptor bluetoothGattDescriptor;
+    public BluetoothGattCharacteristic bluetoothGattCharacteristic;
     public int counter;
 
     public BluetoothDeviceData() {
@@ -31,6 +33,12 @@ public class BluetoothDeviceData {
     public static BluetoothDeviceData newInstance(BluetoothGattDescriptor bluetoothGattDescriptor) {
         BluetoothDeviceData bluetoothDeviceData = new BluetoothDeviceData();
         bluetoothDeviceData.bluetoothGattDescriptor = bluetoothGattDescriptor;
+        return bluetoothDeviceData;
+    }
+
+    public static BluetoothDeviceData newInstance(BluetoothGattCharacteristic characteristic) {
+        BluetoothDeviceData bluetoothDeviceData = new BluetoothDeviceData();
+        bluetoothDeviceData.bluetoothGattCharacteristic = characteristic;
         return bluetoothDeviceData;
     }
 }

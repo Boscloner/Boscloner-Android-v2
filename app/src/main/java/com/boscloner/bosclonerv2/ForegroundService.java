@@ -279,7 +279,7 @@ public class ForegroundService extends LifecycleService {
                 .setContentTitle("Boscloner")
                 .setTicker("Boscloner")
                 .setContentText("Boscloner running")
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)

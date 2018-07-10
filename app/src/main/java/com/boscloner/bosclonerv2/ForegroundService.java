@@ -112,8 +112,10 @@ public class ForegroundService extends LifecycleService {
                     break;
                     case BLUETOOTH_OFF:
                         //TODO ask user to turn on the bluetooth
-                        connectionState = ConnectionState.DISCONNECTED;
-                        updateTheUi();
+                        if (connectionState != ConnectionState.DISCONNECTED) {
+                            connectionState = ConnectionState.DISCONNECTED;
+                            updateTheUi();
+                        }
                         break;
                     case ERROR:
                         Timber.d("Error while scanning please try again");
@@ -125,8 +127,10 @@ public class ForegroundService extends LifecycleService {
                     case BLE_NOT_SUPPORTED:
                     case DEVICE_DOES_NOT_HAVE_BLUETOOTH_ERROR:
                         //TODO display error to the user, both as snackbar in activity, and inside notification
-                        connectionState = ConnectionState.DISCONNECTED;
-                        updateTheUi();
+                        if (connectionState != ConnectionState.DISCONNECTED) {
+                            connectionState = ConnectionState.DISCONNECTED;
+                            updateTheUi();
+                        }
                         break;
                 }
             }
@@ -158,8 +162,10 @@ public class ForegroundService extends LifecycleService {
                         break;
                     case BLUETOOTH_OFF:
                         //TODO ask user to turn on the bluetooth
-                        connectionState = ConnectionState.DISCONNECTED;
-                        updateTheUi();
+                        if (connectionState != ConnectionState.DISCONNECTED) {
+                            connectionState = ConnectionState.DISCONNECTED;
+                            updateTheUi();
+                        }
                         break;
                     case SCAN:
                         if (status.data != null) {

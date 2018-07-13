@@ -84,6 +84,11 @@ public class ForegroundService extends LifecycleService {
                             searchBluetoothDeviceLiveData.stopScan();
                             Timber.d("Found device %s", foundDevices.size());
                             ScanBluetoothDevice bosclonerDevice = foundDevices.get(0);
+                            if (connectionState == ConnectionState.CONNECTION_LOST) {
+                                connectionState = ConnectionState.ATTEMPTING_TO_RECONNECT;
+                            } else {
+                                connectionState = ConnectionState.ATTEMPTING_TO_CONNECT;
+                            }
                             fetchBluetoothData.connect(bosclonerDevice.deviceMacAddress);
                         }
                     }
@@ -354,37 +359,47 @@ public class ForegroundService extends LifecycleService {
     }
 
     private void updateTheUi() {
+        boolean useNotification = false;
         switch (connectionState) {
             case DISCONNECTED:
+                useNotification = false;
                 notificationTitle = "Disconnected";
                 notificationContentText = "Boscloner device Disconnected";
                 break;
             case SCANNING:
+                useNotification = false;
                 notificationTitle = "Scanning";
                 notificationContentText = "Scanning for a Boslconer device";
                 break;
             case ATTEMPTING_TO_CONNECT:
+                useNotification = false;
                 notificationTitle = "Connecting";
                 notificationContentText = "Attempting to Connect to the Boscloner device";
                 break;
             case ATTEMPTING_TO_RECONNECT:
+                useNotification = false;
                 notificationTitle = "Reconnecting";
                 notificationContentText = "Attempting to Reconnect to the Boscloner device";
                 break;
             case CONNECTED:
+                useNotification = true;
                 notificationTitle = "Connected";
                 notificationContentText = "Boscloner Device Connected";
                 break;
             case RECONNECTED:
+                useNotification = true;
                 notificationTitle = "Connection Restored";
                 notificationContentText = "Connection with the Device Restored";
+                break;
             case CONNECTION_LOST:
+                useNotification = true;
                 notificationTitle = "Connection Lost";
                 notificationContentText = "Connection with the Device has been Lost";
                 break;
         }
         uiUpdateBroadcast.putExtra(UI_UPDATE_BROADCAST_KEY, connectionState);
-        if (!LocalBroadcastManager.getInstance(this).sendBroadcast(uiUpdateBroadcast)) {
+        LocalBroadcastManager.getInstance(this).sendBroadcast(uiUpdateBroadcast);
+        if (useNotification) {
             updateNotification();
         }
     }

@@ -198,6 +198,10 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     }
 
     private void sendData(byte[] data) {
+        if (data.length == 0) {
+            Timber.d("Empty data, we should not send to the boscloner");
+            return;
+        }
         if (data.length < 20) {
             multipart = false;
             multipartIndex = 0;

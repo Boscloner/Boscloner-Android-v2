@@ -66,7 +66,6 @@ public class NavigationController {
             fragment = SettingsFragment.newInstance();
         }
         fragmentManager.beginTransaction()
-                .addToBackStack(null)
                 .replace(R.id.fragmentContainer, fragment, SETTINGS_FRAGMENT_TAG)
                 .commit();
     }
@@ -78,7 +77,6 @@ public class NavigationController {
             fragment = HistoryFragment.newInstance();
         }
         activity.getSupportFragmentManager().beginTransaction()
-                .addToBackStack(null)
                 .replace(R.id.fragmentContainer, fragment, HISTORY_FRAGMENT_TAG)
                 .commit();
     }
@@ -90,7 +88,6 @@ public class NavigationController {
             fragment = HomeFragment.newInstance();
         }
         activity.getSupportFragmentManager().beginTransaction()
-                .addToBackStack(null)
                 .replace(R.id.fragmentContainer, fragment, MAIN_ACTIVITY_FRAGMENT_TAG)
                 .commit();
     }

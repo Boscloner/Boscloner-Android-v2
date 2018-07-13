@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.boscloner.bosclonerv2.history.HistoryFragment;
 import com.boscloner.bosclonerv2.room.BosclonerDatabase;
@@ -223,8 +226,12 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     private void showInputDialog() {
         new MaterialDialog.Builder(this)
                 .title(R.string.input)
+                .titleGravity(GravityEnum.CENTER)
                 .content(R.string.input_content)
+                .contentGravity(GravityEnum.CENTER)
                 .inputType(InputType.TYPE_CLASS_TEXT)
+                .negativeText(R.string.cancel)
+                .onNegative((dialog, which) -> dialog.dismiss())
                 .input(R.string.input_hint, R.string.input_prefill, false, (dialog, input) -> {
                     Timber.d("user input %s", input);
                     sendWriteInstructionToService(input.toString(), false);
@@ -255,8 +262,12 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     private void writeFromHistoryDialog(String macAddress) {
         new MaterialDialog.Builder(this)
                 .title(R.string.history_input)
+                .titleGravity(GravityEnum.CENTER)
                 .content(R.string.history_input_content)
+                .contentGravity(GravityEnum.CENTER)
                 .inputType(InputType.TYPE_CLASS_TEXT)
+                .negativeText(R.string.cancel)
+                .onNegative((dialog, which) -> dialog.dismiss())
                 .input(getString(R.string.input_hint), macAddress, false, (dialog, input) -> {
                     Timber.d("user input %s", input);
                     sendWriteInstructionToService(input.toString(), true);

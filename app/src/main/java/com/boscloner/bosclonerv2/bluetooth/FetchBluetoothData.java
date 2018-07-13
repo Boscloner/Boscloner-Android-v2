@@ -201,9 +201,11 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
         if (data.length < 20) {
             multipart = false;
             multipartIndex = 0;
-            writeCharacteristic.setValue(data);
-            writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
-            deviceLiveData.writeCharacteristic(writeCharacteristic);
+            if (writeCharacteristic != null) {
+                writeCharacteristic.setValue(data);
+                writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+                deviceLiveData.writeCharacteristic(writeCharacteristic);
+            }
         } else {
             multipart = true;
             multipartIndex = 0;
@@ -226,9 +228,11 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
         }
         byte[] part = new byte[partSize];
         System.arraycopy(multipartData, multipartIndex, part, 0, partSize);
-        writeCharacteristic.setValue(part);
-        writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        deviceLiveData.writeCharacteristic(writeCharacteristic);
+        if (writeCharacteristic != null) {
+            writeCharacteristic.setValue(part);
+            writeCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            deviceLiveData.writeCharacteristic(writeCharacteristic);
+        }
     }
 
     @MainThread

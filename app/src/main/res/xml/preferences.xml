@@ -3,23 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <PreferenceCategory
-        android:title="@string/settings_autoclone">
+    <PreferenceCategory android:title="@string/settings_autoclone">
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="preferences_auto_clone_key"
             android:title="@string/settings_autoclone_status" />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:title="@string/boscloner_settings">
+    <PreferenceCategory android:title="@string/boscloner_settings">
         <ListPreference
             android:defaultValue="@string/rfid_badge_type_default"
             android:dialogTitle="@string/rfid_badge_type"
             android:entries="@array/RFID"
-            android:summary="%s"
             android:entryValues="@array/RFID"
             android:key="rfid_badge_type"
+            android:summary="%s"
             android:title="@string/rfid_badge_type" />
     </PreferenceCategory>
 

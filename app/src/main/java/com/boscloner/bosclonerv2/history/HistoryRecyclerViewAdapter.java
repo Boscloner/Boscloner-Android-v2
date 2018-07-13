@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.boscloner.bosclonerv2.R;
 import com.boscloner.bosclonerv2.history.HistoryFragment.OnListFragmentInteractionListener;
-import com.boscloner.bosclonerv2.room.Converters;
 import com.boscloner.bosclonerv2.room.HistoryItem;
 
 import org.threeten.bp.format.DateTimeFormatter;
@@ -20,7 +19,7 @@ import java.util.List;
 public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecyclerViewAdapter.ViewHolder> {
 
 
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-DD HH:MM:SS");
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:MM:SS");
     private final OnListFragmentInteractionListener mListener;
     private List<HistoryItem> mValues;
 
@@ -42,7 +41,7 @@ public class HistoryRecyclerViewAdapter extends RecyclerView.Adapter<HistoryRecy
         HistoryItem historyItem = mValues.get(position);
         holder.mItem = historyItem;
         holder.mIdView.setText(historyItem.deviceMacAddress);
-        holder.mContentView.setText(String.format(Converters.fromLocalDateTime(historyItem.localDateTime), dateTimeFormatter));
+        holder.mContentView.setText(historyItem.localDateTime.format(dateTimeFormatter));
 
         holder.mView.setOnClickListener(v -> {
             if (null != mListener) {

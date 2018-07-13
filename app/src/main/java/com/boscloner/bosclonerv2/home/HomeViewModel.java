@@ -55,7 +55,7 @@ public class HomeViewModel extends ViewModel {
                 break;
             case SCANNING:
                 connectionStateProblem.set(true);
-                connectionStateMessage.set("Scanning for Device");
+                connectionStateMessage.set("Attempting Connection to Boscloner");
                 break;
             case CONNECTED:
                 connectionStateProblem.set(false);

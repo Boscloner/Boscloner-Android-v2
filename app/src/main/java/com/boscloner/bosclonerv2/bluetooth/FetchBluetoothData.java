@@ -3,11 +3,9 @@ package com.boscloner.bosclonerv2.bluetooth;
 import android.arch.lifecycle.MediatorLiveData;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
-import android.graphics.Bitmap;
 import android.support.annotation.MainThread;
 import android.text.TextUtils;
 
-import com.boscloner.bosclonerv2.BuildConfig;
 import com.boscloner.bosclonerv2.Constants;
 import com.boscloner.bosclonerv2.util.ActionWithDataStatus;
 import com.boscloner.bosclonerv2.util.AppExecutors;
@@ -24,11 +22,6 @@ import timber.log.Timber;
 @Singleton
 public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<FetchBluetoothDataStatus, FetchBluetoothDataValue>> {
 
-    private DeviceLiveData deviceLiveData;
-    private BluetoothGattCharacteristic writeCharacteristic;
-    private BluetoothGattCharacteristic readCharacteristic;
-    private AppExecutors appExecutors;
-    private String messageFromBoscloner = "";
     boolean autoCloneDefault = true;
     boolean customWriteGlitch = true;
     boolean firstRun = true;
@@ -36,6 +29,11 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     boolean multipart = false;
     int multipartIndex = 0;
     byte[] multipartData;
+    private DeviceLiveData deviceLiveData;
+    private BluetoothGattCharacteristic writeCharacteristic;
+    private BluetoothGattCharacteristic readCharacteristic;
+    private AppExecutors appExecutors;
+    private String messageFromBoscloner = "";
 
     @Inject
     public FetchBluetoothData(DeviceLiveData deviceLiveData, AppExecutors appExecutors) {
@@ -287,7 +285,17 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
     public void writeDataToTheDevice(String macAddress) {
         if (writeCharacteristic != null) {
             customWriteGlitch = false;
-            String command = String.format(Constants.CLONE, macAddress);
+            String stiped = macAddress.replaceAll(":", "");
+            if (stiped.length() < 10) {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(stiped);
+                int count = 10 - stiped.length();
+                for (int i = 0; i < count; i++) {
+                    stringBuilder.append("0");
+                }
+                stiped = stringBuilder.toString();
+            }
+            String command = String.format(Constants.CLONE, stiped);
             Timber.d("Command to write " + command + " " + command.getBytes().length);
             sendData(command.getBytes());
         }

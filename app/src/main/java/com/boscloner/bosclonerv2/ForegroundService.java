@@ -109,8 +109,8 @@ public class ForegroundService extends LifecycleService {
                         } else {
                             if (connectionState != ConnectionState.CONNECTION_LOST) {
                                 connectionState = ConnectionState.SCANNING;
+                                updateTheUi();
                             }
-                            updateTheUi();
                             searchBluetoothDeviceLiveData.startScanning();
                         }
                     }
@@ -354,7 +354,6 @@ public class ForegroundService extends LifecycleService {
                 }
             }
         }
-        updateTheUi();
         return START_STICKY;
     }
 

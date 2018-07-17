@@ -34,8 +34,8 @@
 
         <ImageView
             android:id="@+id/image_view_history_fragment_item_list_share"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="30dp"
+            android:layout_height="35dp"
             android:layout_marginBottom="12dp"
             android:clickable="true"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -45,8 +45,8 @@
 
         <ImageView
             android:id="@+id/image_view_history_fragment_item_list_delete"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="30dp"
+            android:layout_height="35dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="12dp"
             app:layout_constraintBottom_toBottomOf="parent"

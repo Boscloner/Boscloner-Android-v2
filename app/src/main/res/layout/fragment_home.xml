@@ -40,7 +40,7 @@
             android:layout_marginBottom="8dp"
             android:text="@string/custom_write"
             android:textColor="@color/black"
-            android:textSize="24sp"
+            android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@+id/text_view_fragment_home_icon_create"
             app:layout_constraintStart_toStartOf="parent"
             tools:visibleInvisible="@{!viewModel.connectionStateProblem}" />
@@ -53,7 +53,7 @@
             android:layout_marginBottom="8dp"
             android:text="@string/auto_clone"
             android:textColor="@color/black"
-            android:textSize="24sp"
+            android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@+id/switch_auto_fragment_home_clone"
             app:layout_constraintEnd_toEndOf="parent"
             tools:visibleInvisible="@{!viewModel.connectionStateProblem}" />

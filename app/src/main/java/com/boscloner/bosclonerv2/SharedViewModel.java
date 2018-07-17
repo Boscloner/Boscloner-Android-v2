@@ -38,6 +38,10 @@ public class SharedViewModel extends ViewModel {
                 HomeFragmentActions.AUTO_CLONE_OFF);
     }
 
+    public boolean isDeviceConnected() {
+        return connectionStateMutableLiveData.getValue() == ForegroundService.ConnectionState.CONNECTED || connectionStateMutableLiveData.getValue() == ForegroundService.ConnectionState.RECONNECTED;
+    }
+
     public enum HomeFragmentActions {
         CUSTOM_WRITE,
         AUTO_CLONE_ON,

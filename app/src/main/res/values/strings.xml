@@ -31,6 +31,8 @@
     <string name="nothing_to_share">Nothing to share.</string>
     <string name="history_input">Write from history</string>
     <string name="history_input_content">Are you sure you want to write this from history?</string>
+    <string name="boscloner_unavailable">Boscloner Unavailable</string>
+    <string name="disconnected_message">Ensure the Boscloner boards are powered on and within range.</string>
 
     <string-array name="RFID">
         <item>HID ProxCard</item>

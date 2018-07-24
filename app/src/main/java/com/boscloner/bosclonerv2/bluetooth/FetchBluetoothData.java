@@ -22,11 +22,9 @@ import timber.log.Timber;
 @Singleton
 public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<FetchBluetoothDataStatus, FetchBluetoothDataValue>> {
 
-    boolean autoCloneDefault = true;
-    boolean customWriteGlitch = true;
     boolean firstRun = true;
-    boolean writeFromHistoryFile = false;
     boolean multipart = false;
+    DeviceCommands lastCommand;
     int multipartIndex = 0;
     byte[] multipartData;
     private DeviceLiveData deviceLiveData;
@@ -119,39 +117,45 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                             Timber.d("we got the: %s", messagePart);
                             if (!messagePart.isEmpty()) {
                                 messageFromBoscloner += messagePart;
-                                if (messageFromBoscloner.contains(DeviceCommands.SCAN.getValue()) && messageFromBoscloner.contains(DeviceCommands.END_DELIMITER.getValue())) {
+                                if (messageFromBoscloner.contains(DeviceResponses.SCAN.getValue())
+                                        && messageFromBoscloner.contains(DeviceResponses.END_DELIMITER.getValue())) {
                                     Timber.d("We got a SCAN message from the boscloner");
                                     String scanDeviceAddress = messageFromBoscloner.substring(7, messageFromBoscloner.length() - 3);
                                     Timber.d("SCAN: clone device scan address: %s", scanDeviceAddress);
-                                    autoCloneDefault = false;
                                     messageFromBoscloner = "";
                                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.SCAN, new FetchBluetoothDataValue(scanDeviceAddress)));
-                                } else if (messageFromBoscloner.contains(DeviceCommands.CLONE.getValue()) && messageFromBoscloner.contains(DeviceCommands.END_DELIMITER.getValue())) {
+                                } else if (messageFromBoscloner.contains(DeviceResponses.CLONE.getValue())
+                                        && messageFromBoscloner.contains(DeviceResponses.END_DELIMITER.getValue())) {
                                     Timber.d("We got a CLONE message from the bosclone");
                                     String cloneDeviceAddress = messageFromBoscloner.substring(8, messageFromBoscloner.length() - 3);
                                     Timber.d("CLONE: clone device clone address: %S", cloneDeviceAddress);
-                                    autoCloneDefault = true;
                                     messageFromBoscloner = "";
                                     setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.CLONE, new FetchBluetoothDataValue(cloneDeviceAddress)));
-                                } else if (messageFromBoscloner.contains(DeviceCommands.STATUS_MCU.getValue()) && customWriteGlitch) {
+                                } else if (messageFromBoscloner.contains(DeviceResponses.STATUS_MCU.getValue())) {
                                     messageFromBoscloner = "";
-                                    if (autoCloneDefault && firstRun) {
-                                        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.STATUS_MCU_ENABLED, new FetchBluetoothDataValue("")));
-                                        firstRun = false;
-                                    } else if (!autoCloneDefault && firstRun) {
-                                        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.STATUS_MCU_DISABLED, new FetchBluetoothDataValue("")));
-                                        firstRun = false;
-                                    } else if (autoCloneDefault && !firstRun && !writeFromHistoryFile) {
-                                        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_ENABLED, new FetchBluetoothDataValue("")));
-                                    } else if (!autoCloneDefault && !firstRun && !writeFromHistoryFile) {
-                                        setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_DISABLED, new FetchBluetoothDataValue("")));
-                                    } else {
-                                        writeFromHistoryFile = false;
-                                        Timber.d("Write operation executed from History Log File");
+                                    switch (lastCommand) {
+                                        case ENABLE_CLONE:
+                                            setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_ENABLED,
+                                                    new FetchBluetoothDataValue("")));
+                                            if (firstRun) {
+                                                setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.STATUS_MCU_ENABLED,
+                                                        new FetchBluetoothDataValue("")));
+                                                firstRun = false;
+                                            }
+                                            break;
+                                        case DISABLE_CLONE:
+                                            setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_DISABLED,
+                                                    new FetchBluetoothDataValue("")));
+                                            if (firstRun) {
+                                                setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.STATUS_MCU_DISABLED,
+                                                        new FetchBluetoothDataValue("")));
+                                                firstRun = false;
+                                            }
+                                            break;
+                                        default:
+                                            Timber.d("Custom Data Written. Ignoring STATUS,MCU Signal");
+                                            break;
                                     }
-                                } else if (messageFromBoscloner.contains(DeviceCommands.STATUS_MCU.getValue()) && !customWriteGlitch) {
-                                    messageFromBoscloner = "";
-                                    Timber.d("Custom Data Written. Ignoring STATUS,MCU Signal");
                                 }
                             } else {
                                 Timber.d("Data set not complete. Nothing to print just yet");
@@ -266,16 +270,12 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
 
     public void onAutoCloneChanged(boolean isChecked) {
         if (writeCharacteristic != null) {
-            if (isChecked && !autoCloneDefault) {
-                customWriteGlitch = true;
-                sendData(Constants.ENABLE_CLONE.getBytes());
-                autoCloneDefault = true;
-                setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_ENABLED, new FetchBluetoothDataValue("")));
-            } else if (!isChecked && autoCloneDefault) {
-                customWriteGlitch = true;
-                sendData(Constants.DISABLE_CLONE.getBytes());
-                autoCloneDefault = false;
-                setValue(new ActionWithDataStatus<>(FetchBluetoothDataStatus.AUTO_CLONE_DISABLED, new FetchBluetoothDataValue("")));
+            if (isChecked) {
+                lastCommand = DeviceCommands.ENABLE_CLONE;
+                sendData(DeviceCommands.ENABLE_CLONE.getValue().getBytes());
+            } else if (!isChecked) {
+                lastCommand = DeviceCommands.DISABLE_CLONE;
+                sendData(DeviceCommands.DISABLE_CLONE.getValue().getBytes());
             } else {
                 Timber.d("Auto clone is already on the proper value");
             }
@@ -284,7 +284,6 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
 
     public void writeDataToTheDevice(String macAddress) {
         if (writeCharacteristic != null) {
-            customWriteGlitch = false;
             String stiped = macAddress.replaceAll(":", "");
             if (stiped.length() < 10) {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -295,7 +294,8 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
                 }
                 stiped = stringBuilder.toString();
             }
-            String command = String.format(Constants.CLONE, stiped);
+            lastCommand = DeviceCommands.CLONE;
+            String command = String.format(DeviceCommands.CLONE.getValue(), stiped);
             Timber.d("Command to write " + command + " " + command.getBytes().length);
             sendData(command.getBytes());
         }

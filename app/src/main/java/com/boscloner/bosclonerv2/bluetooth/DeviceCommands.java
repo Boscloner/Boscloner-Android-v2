@@ -1,10 +1,9 @@
 package com.boscloner.bosclonerv2.bluetooth;
 
 public enum DeviceCommands {
-    SCAN("SCAN"),
-    CLONE("CLONE"),
-    STATUS_MCU("STATUS,MCU"),
-    END_DELIMITER("?$");
+    CLONE("$!CLONE,%s?$"),
+    DISABLE_CLONE("$!DISABLE_CLONE?$"),
+    ENABLE_CLONE("$!ENABLE_CLONE?$");
 
     private String value;
 

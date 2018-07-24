@@ -254,6 +254,11 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
 
     public void disconnect() {
         deviceLiveData.disconnect();
+        firstRun = true;
+        lastCommand = null;
+        writeCharacteristic = null;
+        readCharacteristic = null;
+        messageFromBoscloner = "";
     }
 
     @Override

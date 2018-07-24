@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 
 import com.boscloner.bosclonerv2.history.HistoryFragment;
 import com.boscloner.bosclonerv2.history.SettingsFragment;
@@ -21,9 +22,16 @@ public class NavigationController {
     public static final String SETTINGS_FRAGMENT_TAG = "settings_fragment_tag";
     public static final String HISTORY_FRAGMENT_TAG = "history_fragment_tag";
     public static final String MAIN_ACTIVITY_FRAGMENT_TAG = "home_fragment_tag";
+    public Fragment activeFragment;
+    public Fragment homeFragment;
+    public Fragment historyFragment;
+    public Fragment settingsFragment;
 
     @Inject
     public NavigationController() {
+        homeFragment = HomeFragment.newInstance();
+        historyFragment = HistoryFragment.newInstance();
+        settingsFragment = SettingsFragment.newInstance();
     }
 
     public void navigateToPermissionFragment(FragmentActivity fragmentActivity,
@@ -60,35 +68,33 @@ public class NavigationController {
     }
 
     public void navigateToSettingsFragment(@NonNull FragmentActivity activity) {
-        FragmentManager fragmentManager = activity.getSupportFragmentManager();
-        Fragment fragment = fragmentManager.findFragmentByTag(SETTINGS_FRAGMENT_TAG);
-        if (fragment == null) {
-            fragment = SettingsFragment.newInstance();
-        }
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, fragment, SETTINGS_FRAGMENT_TAG)
-                .commit();
+        navigateToFragment(activity, settingsFragment, SETTINGS_FRAGMENT_TAG);
     }
 
     public void navigateToHistoryFragment(@NonNull FragmentActivity activity) {
-        FragmentManager fragmentManager = activity.getSupportFragmentManager();
-        Fragment fragment = fragmentManager.findFragmentByTag(HISTORY_FRAGMENT_TAG);
-        if (fragment == null) {
-            fragment = HistoryFragment.newInstance();
-        }
-        activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, fragment, HISTORY_FRAGMENT_TAG)
-                .commit();
+        navigateToFragment(activity, historyFragment, HISTORY_FRAGMENT_TAG);
     }
 
     public void navigateToHomeFragment(@NonNull FragmentActivity activity) {
+        navigateToFragment(activity, homeFragment, MAIN_ACTIVITY_FRAGMENT_TAG);
+    }
+
+    public void navigateToFragment(@NonNull FragmentActivity activity, Fragment newFragment, String tag) {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
-        Fragment fragment = fragmentManager.findFragmentByTag(MAIN_ACTIVITY_FRAGMENT_TAG);
+        Fragment fragment = fragmentManager.findFragmentByTag(tag);
         if (fragment == null) {
-            fragment = HomeFragment.newInstance();
+            fragmentManager.beginTransaction()
+                    .add(R.id.fragmentContainer, newFragment, tag)
+                    .commit();
         }
-        activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, fragment, MAIN_ACTIVITY_FRAGMENT_TAG)
-                .commit();
+        if (activeFragment == null || activeFragment != newFragment) {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            if (activeFragment != null) {
+                fragmentTransaction.hide(activeFragment);
+            }
+            fragmentTransaction.show(newFragment);
+            fragmentTransaction.commit();
+            activeFragment = newFragment;
+        }
     }
 }

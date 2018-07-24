@@ -210,8 +210,8 @@ public class ForegroundService extends LifecycleService {
                         appExecutors.diskIO().execute(() -> {
                             Event event = new Event();
                             event.type = EventType.STATUS_MCU_ENABLED;
-                            //TODO get the actual badget type from shared preferences here
-                            event.value = "**RFID Badge Type: " + "RFID badge type" + "\n" +
+
+                            event.value = "**RFID Badge Type: " + badgeType.getValue() + "\n" +
                                     "----------------------------\n" +
                                     "Boscloner$ (Ready to Receive Data)";
                             database.eventDao().addEvent(event);

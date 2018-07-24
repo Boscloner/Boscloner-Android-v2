@@ -278,11 +278,9 @@ public class FetchBluetoothData extends MediatorLiveData<ActionWithDataStatus<Fe
             if (isChecked) {
                 lastCommand = DeviceCommands.ENABLE_CLONE;
                 sendData(DeviceCommands.ENABLE_CLONE.getValue().getBytes());
-            } else if (!isChecked) {
+            } else {
                 lastCommand = DeviceCommands.DISABLE_CLONE;
                 sendData(DeviceCommands.DISABLE_CLONE.getValue().getBytes());
-            } else {
-                Timber.d("Auto clone is already on the proper value");
             }
         }
     }

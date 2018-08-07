@@ -65,9 +65,9 @@ public class ForegroundService extends LifecycleService {
         AndroidInjection.inject(this);
         super.onCreate();
         connectionState = ConnectionState.LOADING;
+        readStatusAndBadgeType();
         prepareNotification();
         updateTheUi();
-        readStatusAndBadgeType();
         clearTheDatabase();
         searchBluetoothDeviceLiveData = new SearchBluetoothDeviceLiveData(this);
         this.searchBluetoothDeviceLiveData.observe(this, status -> {
@@ -210,8 +210,8 @@ public class ForegroundService extends LifecycleService {
                         appExecutors.diskIO().execute(() -> {
                             Event event = new Event();
                             event.type = EventType.STATUS_MCU_ENABLED;
-
-                            event.value = "**RFID Badge Type: " + badgeType.getValue() + "\n" +
+                            String badgeValue = badgeType == null ? "Unknown badge" : badgeType.getValue();
+                            event.value = "**RFID Badge Type: " + badgeValue + "\n" +
                                     "----------------------------\n" +
                                     "Boscloner$ (Ready to Receive Data)";
                             database.eventDao().addEvent(event);

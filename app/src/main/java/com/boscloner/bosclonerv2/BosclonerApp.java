@@ -36,7 +36,7 @@ public class BosclonerApp extends Application implements HasActivityInjector, Ha
         } else {
             Fabric.with(this, new Crashlytics());
         }
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
     }
 
     @Override
